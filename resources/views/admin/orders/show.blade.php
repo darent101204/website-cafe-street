@@ -136,7 +136,7 @@
                         <label class="text-muted small d-block mb-1">Payment Method</label>
                         @if($order->payment_method === 'cash')
                             <span class="badge bg-success text-white px-3 py-1.5 rounded-pill"><i class="fa-solid fa-money-bill-wave me-1"></i> Cash at Cashier</span>
-                        @elseif($order->payment_method === 'qris')
+                        @elseif($order->payment_method === 'online')
                             <span class="badge bg-primary text-white px-3 py-1.5 rounded-pill"><i class="fa fa-qrcode me-1"></i> QRIS / Online</span>
                         @else
                             <span class="badge bg-secondary text-white px-3 py-1.5 rounded-pill"><i class="fa fa-clock me-1"></i> Legacy / Cash</span>

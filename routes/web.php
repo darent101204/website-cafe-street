@@ -53,6 +53,8 @@ Route::post('/checkout/setup', function (\Illuminate\Http\Request $request) {
     return redirect()->route('checkout.index');
 })->name('checkout.setup');
 Route::get('/checkout/success', [App\Http\Controllers\OrderController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/payment/{tracking_token}', [App\Http\Controllers\OrderController::class, 'payment'])->name('checkout.payment');
+Route::post('/midtrans/callback', [App\Http\Controllers\OrderController::class, 'callback'])->name('midtrans.callback');
 Route::get('/order/track/{tracking_token}', [App\Http\Controllers\OrderController::class, 'track'])->name('order.track');
 
 // Admin routes (Middleware will be added to this group later)

@@ -94,7 +94,7 @@ class PaymentArchitectureTest extends TestCase
 
         $response1->assertSessionHasErrors(['payment_method']);
 
-        // Place with QRIS payment method (should succeed)
+        // Place with QRIS payment method (should succeed and redirect to payment page)
         $response2 = $this->withSession([
             'cart' => [
                 $this->product->id => [
@@ -117,9 +117,10 @@ class PaymentArchitectureTest extends TestCase
 
         $this->assertNotNull($order);
         $this->assertEquals('delivery', $order->order_type);
-        $this->assertEquals('qris', $order->payment_method);
+        $this->assertEquals('online', $order->payment_method);
         $this->assertEquals('unpaid', $order->payment_status);
-        $response2->assertRedirect(route('order.track', $order->tracking_token));
+        $this->assertEquals('test-snap-token', $order->snap_token);
+        $response2->assertRedirect(route('checkout.payment', $order->tracking_token));
     }
 
     /**
@@ -142,28 +143,28 @@ class PaymentArchitectureTest extends TestCase
             'tracking_token' => 'token-1',
         ]);
 
-        // 2. QRIS order with unpaid -> should hide
-        $orderQrisUnpaid = Order::create([
-            'name' => 'QRIS Unpaid',
+        // 2. Online order with unpaid -> should hide
+        $orderOnlineUnpaid = Order::create([
+            'name' => 'Online Unpaid',
             'phone' => '081234',
             'address' => '-',
             'total_price' => 35,
             'status' => 'pending',
             'order_type' => 'takeaway',
-            'payment_method' => 'qris',
+            'payment_method' => 'online',
             'payment_status' => 'unpaid',
             'tracking_token' => 'token-2',
         ]);
 
-        // 3. QRIS order with paid -> should show
-        $orderQrisPaid = Order::create([
-            'name' => 'QRIS Paid',
+        // 3. Online order with paid -> should show
+        $orderOnlinePaid = Order::create([
+            'name' => 'Online Paid',
             'phone' => '081234',
             'address' => '-',
             'total_price' => 35,
             'status' => 'pending',
             'order_type' => 'takeaway',
-            'payment_method' => 'qris',
+            'payment_method' => 'online',
             'payment_status' => 'paid',
             'tracking_token' => 'token-3',
         ]);
@@ -177,7 +178,7 @@ class PaymentArchitectureTest extends TestCase
             'status' => 'pending',
             'order_type' => 'takeaway',
             'payment_method' => null,
-            'payment_status' => 'unpaid', // payment_method is null, so it shows
+            'payment_status' => 'unpaid',
             'tracking_token' => 'token-4',
         ]);
 
@@ -189,8 +190,8 @@ class PaymentArchitectureTest extends TestCase
         $pendingOrders = $response->viewData('pending');
 
         $this->assertTrue($pendingOrders->contains('id', $orderCashPending->id));
-        $this->assertFalse($pendingOrders->contains('id', $orderQrisUnpaid->id));
-        $this->assertTrue($pendingOrders->contains('id', $orderQrisPaid->id));
+        $this->assertFalse($pendingOrders->contains('id', $orderOnlineUnpaid->id));
+        $this->assertTrue($pendingOrders->contains('id', $orderOnlinePaid->id));
         $this->assertTrue($pendingOrders->contains('id', $orderLegacy->id));
     }
 
@@ -208,8 +209,8 @@ class PaymentArchitectureTest extends TestCase
             'total_price' => 35,
             'status' => 'pending',
             'order_type' => 'takeaway',
-            'payment_method' => 'cash',
-            'payment_status' => 'pending_cash',
+            'payment_method' => 'online',
+            'payment_status' => 'unpaid',
             'tracking_token' => 'token-pay',
         ]);
 
@@ -219,6 +220,47 @@ class PaymentArchitectureTest extends TestCase
 
         $response->assertRedirect(route('admin.orders.show', $order));
         
+        $order->refresh();
+        $this->assertEquals('paid', $order->payment_status);
+        $this->assertNotNull($order->paid_at);
+    }
+
+    /**
+     * Test 5: Midtrans Callback Webhook
+     */
+    public function test_midtrans_callback_webhook(): void
+    {
+        $order = Order::create([
+            'name' => 'Online Customer',
+            'phone' => '081234',
+            'address' => '-',
+            'total_price' => 35,
+            'status' => 'pending',
+            'order_type' => 'takeaway',
+            'payment_method' => 'online',
+            'payment_status' => 'unpaid',
+            'tracking_token' => 'token-webhook',
+        ]);
+
+        $orderId = 'ORDER-' . $order->id . '-' . time();
+        $statusCode = '200';
+        $grossAmount = '35.00';
+        $serverKey = config('midtrans.server_key');
+        
+        $signatureKey = hash("sha512", $orderId . $statusCode . $grossAmount . $serverKey);
+
+        $response = $this->postJson('/midtrans/callback', [
+            'order_id' => $orderId,
+            'status_code' => $statusCode,
+            'gross_amount' => $grossAmount,
+            'signature_key' => $signatureKey,
+            'transaction_status' => 'settlement',
+            'payment_type' => 'qris',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Webhook processed successfully']);
+
         $order->refresh();
         $this->assertEquals('paid', $order->payment_status);
         $this->assertNotNull($order->paid_at);

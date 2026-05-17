@@ -123,6 +123,16 @@
                 </div>
             @endif
 
+            @if($order->payment_method === 'online' && $order->payment_status !== 'paid')
+                <div class="alert alert-warning rounded-4 shadow-sm border-0 mb-4 p-4 text-center">
+                    <h5 class="fw-bold mb-2" style="color: #856404;"><i class="fa fa-qrcode me-2"></i> Waiting for Payment</h5>
+                    <p class="small text-muted mb-3">We are waiting for your QRIS payment. Please complete the transaction to process your order in the kitchen.</p>
+                    <a href="{{ route('checkout.payment', $order->tracking_token) }}" class="btn btn-warning rounded-5 px-4 text-dark fw-bold btn-sm">
+                        <i class="fa fa-credit-card me-1"></i> Complete Payment Now
+                    </a>
+                </div>
+            @endif
+
             <!-- Main Status Card -->
             <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
                 <div class="p-4 text-center text-white" style="background-color: #2F2F2F;">
@@ -139,7 +149,7 @@
 
                         @if($order->payment_method === 'cash')
                             <span class="badge bg-success text-white py-1.5 px-3 rounded-pill"><i class="fa-solid fa-money-bill-wave me-1"></i> Cash at Cashier</span>
-                        @elseif($order->payment_method === 'qris')
+                        @elseif($order->payment_method === 'online')
                             <span class="badge bg-primary text-white py-1.5 px-3 rounded-pill"><i class="fa fa-qrcode me-1"></i> QRIS</span>
                         @endif
 

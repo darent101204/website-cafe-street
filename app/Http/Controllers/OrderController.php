@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -92,6 +93,7 @@ class OrderController extends Controller
 
         try {
             $trackingToken = \Illuminate\Support\Str::uuid()->toString();
+            $dbPaymentMethod = ($request->payment_method === 'cash') ? 'cash' : 'online';
             $paymentStatus = ($request->payment_method === 'cash') ? 'pending_cash' : 'unpaid';
 
             // Create Order
@@ -107,7 +109,7 @@ class OrderController extends Controller
                 'table_id' => $tableId,
                 'maps_link' => $mapsLink,
                 'tracking_token' => $trackingToken,
-                'payment_method' => $request->payment_method,
+                'payment_method' => $dbPaymentMethod,
                 'payment_status' => $paymentStatus,
             ]);
 
@@ -121,17 +123,157 @@ class OrderController extends Controller
                 ]);
             }
 
+            // If online/qris, generate Midtrans Snap transaction
+            if ($dbPaymentMethod === 'online') {
+                $this->initMidtrans();
+
+                $midtransOrderId = 'ORDER-' . $order->id . '-' . time();
+                
+                $params = [
+                    'transaction_details' => [
+                        'order_id' => $midtransOrderId,
+                        'gross_amount' => (int) $total,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $request->name,
+                        'phone' => $request->phone,
+                    ],
+                    'enabled_payments' => ['qris'],
+                ];
+
+                // Generate Snap Token
+                $snapToken = app()->environment('testing') ? 'test-snap-token' : \Midtrans\Snap::getSnapToken($params);
+
+                // Update Order with token and midtrans id
+                $order->update([
+                    'midtrans_order_id' => $midtransOrderId,
+                    'snap_token' => $snapToken,
+                ]);
+            }
+
             // Clear Cart
             session()->forget('cart');
             
             DB::commit();
 
+            if ($dbPaymentMethod === 'online') {
+                return redirect()->route('checkout.payment', ['tracking_token' => $order->tracking_token]);
+            }
+
             return redirect()->route('order.track', ['tracking_token' => $order->tracking_token])->with('success', 'Order placed successfully!');
 
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
+            Log::error('Checkout payment setup failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
         }
+    }
+
+    /**
+     * Initialize Midtrans Configuration
+     */
+    private function initMidtrans()
+    {
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+    }
+
+    /**
+     * Show dedicated premium payment waiting page
+     */
+    public function payment($tracking_token)
+    {
+        if (empty($tracking_token)) {
+            abort(404);
+        }
+
+        $order = Order::with('items.product', 'table')
+            ->where('tracking_token', $tracking_token)
+            ->first();
+
+        if (!$order) {
+            abort(404);
+        }
+
+        // If it's a cash order, or already paid online, direct to tracking immediately
+        if ($order->payment_method !== 'online' || $order->payment_status === 'paid') {
+            return redirect()->route('order.track', $order->tracking_token);
+        }
+
+        return view('checkout.payment', compact('order'));
+    }
+
+    /**
+     * Handle secure Midtrans Webhook Callback
+     */
+    public function callback(Request $request)
+    {
+        Log::info('Midtrans Webhook Received:', $request->all());
+
+        $orderId = $request->input('order_id');
+        $statusCode = $request->input('status_code');
+        $grossAmount = $request->input('gross_amount');
+        $signatureKey = $request->input('signature_key');
+
+        $serverKey = config('midtrans.server_key');
+
+        // Verify signature key authenticity
+        $computedSignature = hash("sha512", $orderId . $statusCode . $grossAmount . $serverKey);
+
+        if ($signatureKey !== $computedSignature) {
+            Log::warning("Midtrans Webhook signature verification failed! Computed: {$computedSignature}, Received: {$signatureKey}");
+            return response()->json(['message' => 'Invalid signature'], 403);
+        }
+
+        // Extract internal database order ID from Midtrans order_id
+        $parts = explode('-', $orderId);
+        $dbOrderId = isset($parts[1]) ? (int) $parts[1] : null;
+
+        if (!$dbOrderId) {
+            Log::error("Failed to parse internal Order ID from Midtrans Order ID: {$orderId}");
+            return response()->json(['message' => 'Invalid order format'], 400);
+        }
+
+        $order = Order::find($dbOrderId);
+
+        if (!$order) {
+            Log::error("Order #{$dbOrderId} not found in database for Midtrans callback.");
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Idempotent safeguard: skip if already paid
+        if ($order->payment_status === 'paid') {
+            Log::info("Order #{$order->id} is already marked as Paid. Skipping webhook updates (Idempotency Safe).");
+            return response()->json(['message' => 'Order already processed (idempotent)'], 200);
+        }
+
+        $transactionStatus = $request->input('transaction_status');
+
+        // Map status safely
+        $mappedStatus = 'unpaid';
+        if ($transactionStatus === 'settlement' || $transactionStatus === 'capture') {
+            $mappedStatus = 'paid';
+        } elseif ($transactionStatus === 'pending') {
+            $mappedStatus = 'pending';
+        } elseif ($transactionStatus === 'expire') {
+            $mappedStatus = 'expired';
+        } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'deny') {
+            $mappedStatus = 'failed';
+        }
+
+        // Update ONLY payment fields
+        $updateData = ['payment_status' => $mappedStatus];
+        if ($mappedStatus === 'paid') {
+            $updateData['paid_at'] = now();
+        }
+
+        $order->update($updateData);
+
+        Log::info("Order #{$order->id} payment status successfully updated to {$mappedStatus} by Midtrans Webhook.");
+
+        return response()->json(['message' => 'Webhook processed successfully'], 200);
     }
 
     /**

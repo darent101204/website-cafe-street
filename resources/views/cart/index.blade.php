@@ -91,9 +91,9 @@
                         <a href="{{ route('products.index') }}" class="btn btn-outline-secondary w-100 mb-2 rounded-5">
                             Continue Shopping
                         </a>
-                        <button class="btn w-100 rounded-5" style="background-color: #FF902A; color: white;">
+                        <a href="{{ route('checkout.index') }}" class="btn w-100 rounded-5" style="background-color: #FF902A; color: white;">
                             Proceed to Checkout
-                        </button>
+                        </a>
                         <form action="{{ route('cart.clear') }}" method="POST" class="mt-3">
                             @csrf
                             @method('DELETE')

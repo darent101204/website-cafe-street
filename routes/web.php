@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,3 +36,29 @@ Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear
 
 // Table QR routing
 Route::get('/table/{token}', [App\Http\Controllers\TableController::class, 'access'])->name('table.access');
+
+// Checkout routes
+Route::get('/checkout', [App\Http\Controllers\OrderController::class, 'create'])->name('checkout.index');
+Route::post('/checkout', [App\Http\Controllers\OrderController::class, 'store'])->name('checkout.store');
+Route::get('/checkout/success', [App\Http\Controllers\OrderController::class, 'success'])->name('checkout.success');
+
+// Admin routes (Middleware will be added to this group later)
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/orders', [App\Http\Controllers\AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [App\Http\Controllers\AdminOrderController::class, 'show'])->name('orders.show');
+    Route::patch('/orders/{order}/status', [App\Http\Controllers\AdminOrderController::class, 'updateStatus'])->name('orders.status');
+});
+
+// -- BREEZE AUTH ROUTES --
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';

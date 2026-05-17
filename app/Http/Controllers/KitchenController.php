@@ -12,9 +12,20 @@ class KitchenController extends Controller
      */
     public function index()
     {
-        // Load active orders grouped by operational status
+        // Load active orders grouped by operational status and filtered by payment visibility rules
         $orders = Order::with('items.product', 'table')
             ->whereIn('status', ['pending', 'preparing', 'ready', 'completed'])
+            ->where(function ($query) {
+                // Show cash orders that are pending cash payment confirmation
+                $query->where(function ($q) {
+                    $q->where('payment_method', 'cash')
+                      ->where('payment_status', 'pending_cash');
+                })
+                // OR show any order that is paid (e.g. paid QRIS or cash completed)
+                ->orWhere('payment_status', 'paid')
+                // OR show legacy orders for backward compatibility
+                ->orWhereNull('payment_method');
+            })
             ->latest()
             ->get();
 

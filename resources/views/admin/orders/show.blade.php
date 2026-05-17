@@ -127,6 +127,74 @@
                 </div>
             </div>
 
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small d-block mb-1">Payment Method</label>
+                        @if($order->payment_method === 'cash')
+                            <span class="badge bg-success text-white px-3 py-1.5 rounded-pill"><i class="fa-solid fa-money-bill-wave me-1"></i> Cash at Cashier</span>
+                        @elseif($order->payment_method === 'qris')
+                            <span class="badge bg-primary text-white px-3 py-1.5 rounded-pill"><i class="fa fa-qrcode me-1"></i> QRIS / Online</span>
+                        @else
+                            <span class="badge bg-secondary text-white px-3 py-1.5 rounded-pill"><i class="fa fa-clock me-1"></i> Legacy / Cash</span>
+                        @endif
+                    </div>
+                    <div class="mb-0">
+                        <label class="text-muted small d-block mb-1">Payment Status</label>
+                        @php
+                            $statusLabels = [
+                                'pending_cash' => ['label' => 'Pending Cash', 'class' => 'bg-warning text-dark'],
+                                'unpaid' => ['label' => 'Unpaid', 'class' => 'bg-orange text-white'],
+                                'paid' => ['label' => 'Paid', 'class' => 'bg-success text-white'],
+                                'failed' => ['label' => 'Failed', 'class' => 'bg-danger text-white'],
+                                'expired' => ['label' => 'Expired', 'class' => 'bg-dark text-white'],
+                            ];
+                            $paymentStatus = $order->payment_status ?? 'unpaid';
+                            if (is_null($order->payment_method)) {
+                                $currentLabel = ['label' => 'Legacy (Paid)', 'class' => 'bg-secondary text-white'];
+                            } else {
+                                $currentLabel = $statusLabels[$paymentStatus] ?? ['label' => ucfirst($paymentStatus), 'class' => 'bg-secondary text-white'];
+                            }
+                        @endphp
+                        <span class="badge {{ $currentLabel['class'] }} px-3 py-1.5 rounded-pill" style="{{ $paymentStatus === 'unpaid' && $order->payment_method ? 'background-color: #FF902A !important;' : '' }}">
+                            {{ $currentLabel['label'] }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @if($order->payment_method)
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Update Payment Status</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.orders.payment', $order) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        
+                        <div class="mb-3">
+                            <label for="payment_status" class="form-label">Payment Status</label>
+                            <select name="payment_status" id="payment_status" class="form-select">
+                                <option value="pending_cash" {{ ($order->payment_status ?? 'unpaid') == 'pending_cash' ? 'selected' : '' }}>Pending Cash</option>
+                                <option value="unpaid" {{ ($order->payment_status ?? 'unpaid') == 'unpaid' ? 'selected' : '' }}>Unpaid</option>
+                                <option value="paid" {{ ($order->payment_status ?? 'unpaid') == 'paid' ? 'selected' : '' }}>Paid</option>
+                                <option value="failed" {{ ($order->payment_status ?? 'unpaid') == 'failed' ? 'selected' : '' }}>Failed</option>
+                                <option value="expired" {{ ($order->payment_status ?? 'unpaid') == 'expired' ? 'selected' : '' }}>Expired</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn w-100 text-white rounded-5" style="background-color: #FF902A;">
+                            Update Payment Status
+                        </button>
+                    </form>
+                </div>
+            </div>
+            @endif
+
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0">Order Status</h5>

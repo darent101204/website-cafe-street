@@ -21,6 +21,11 @@ class Order extends Model
         'table_id',
         'maps_link',
         'tracking_token',
+        'payment_method',
+        'payment_status',
+        'midtrans_order_id',
+        'snap_token',
+        'paid_at',
     ];
 
     public function items()

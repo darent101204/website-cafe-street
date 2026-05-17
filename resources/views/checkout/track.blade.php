@@ -128,13 +128,43 @@
                 <div class="p-4 text-center text-white" style="background-color: #2F2F2F;">
                     <span class="text-uppercase small tracking-wider text-muted-custom" style="color: #adb5bd;">Order Tracking ID</span>
                     <h4 class="mb-0 fw-bold">#{{ $order->id }}</h4>
-                    <div class="mt-2">
+                    <div class="mt-2 d-flex justify-content-center gap-2 flex-wrap">
                         @if(($order->order_type ?? 'takeaway') === 'dine_in')
                             <span class="badge bg-warning text-dark py-1.5 px-3 rounded-pill"><i class="fa fa-utensils me-1"></i> Dine In — Table {{ $order->table->table_number ?? 'N/A' }}</span>
                         @elseif(($order->order_type ?? 'takeaway') === 'delivery')
                             <span class="badge bg-info text-white py-1.5 px-3 rounded-pill"><i class="fa fa-truck me-1"></i> Delivery</span>
                         @else
                             <span class="badge bg-secondary text-white py-1.5 px-3 rounded-pill"><i class="fa fa-bag-shopping me-1"></i> Take Away</span>
+                        @endif
+
+                        @if($order->payment_method === 'cash')
+                            <span class="badge bg-success text-white py-1.5 px-3 rounded-pill"><i class="fa-solid fa-money-bill-wave me-1"></i> Cash at Cashier</span>
+                        @elseif($order->payment_method === 'qris')
+                            <span class="badge bg-primary text-white py-1.5 px-3 rounded-pill"><i class="fa fa-qrcode me-1"></i> QRIS</span>
+                        @endif
+
+                        @if($order->payment_method)
+                            @php
+                                $statusClasses = [
+                                    'pending_cash' => 'bg-warning text-dark',
+                                    'unpaid' => 'bg-danger text-white',
+                                    'paid' => 'bg-success text-white',
+                                    'failed' => 'bg-danger text-white',
+                                    'expired' => 'bg-secondary text-white',
+                                ];
+                                $statusLabels = [
+                                    'pending_cash' => 'Pending Cash',
+                                    'unpaid' => 'Unpaid',
+                                    'paid' => 'Paid',
+                                    'failed' => 'Failed',
+                                    'expired' => 'Expired',
+                                ];
+                                $currentClass = $statusClasses[$order->payment_status] ?? 'bg-secondary text-white';
+                                $currentLabel = $statusLabels[$order->payment_status] ?? ucfirst($order->payment_status);
+                            @endphp
+                            <span class="badge {{ $currentClass }} py-1.5 px-3 rounded-pill">
+                                {{ $currentLabel }}
+                            </span>
                         @endif
                     </div>
                 </div>

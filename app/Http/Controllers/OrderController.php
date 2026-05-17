@@ -55,6 +55,9 @@ class OrderController extends Controller
         if ($orderType === 'delivery') {
             $rules['address'] = 'required|string|max:500';
             $rules['maps_link'] = 'nullable|url|max:1000';
+            $rules['payment_method'] = 'required|in:qris';
+        } else {
+            $rules['payment_method'] = 'required|in:cash,qris';
         }
 
         $request->validate($rules);
@@ -89,6 +92,7 @@ class OrderController extends Controller
 
         try {
             $trackingToken = \Illuminate\Support\Str::uuid()->toString();
+            $paymentStatus = ($request->payment_method === 'cash') ? 'pending_cash' : 'unpaid';
 
             // Create Order
             $order = Order::create([
@@ -103,6 +107,8 @@ class OrderController extends Controller
                 'table_id' => $tableId,
                 'maps_link' => $mapsLink,
                 'tracking_token' => $trackingToken,
+                'payment_method' => $request->payment_method,
+                'payment_status' => $paymentStatus,
             ]);
 
             // Create Order Items

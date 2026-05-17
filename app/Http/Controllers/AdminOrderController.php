@@ -38,4 +38,23 @@ class AdminOrderController extends Controller
 
         return redirect()->route('admin.orders.show', $order)->with('success', 'Order status updated successfully!');
     }
+
+    /**
+     * Update the payment status of the order.
+     */
+    public function updatePaymentStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:pending_cash,unpaid,paid,failed,expired',
+        ]);
+
+        $updateData = ['payment_status' => $request->payment_status];
+        if ($request->payment_status === 'paid') {
+            $updateData['paid_at'] = now();
+        }
+
+        $order->update($updateData);
+
+        return redirect()->route('admin.orders.show', $order)->with('success', 'Payment status updated successfully!');
+    }
 }

@@ -9,6 +9,9 @@
             <h2>Order <span style="border-bottom: 3px solid #FF902A;">Management</span></h2>
         </div>
         <div class="col-md-6 text-end">
+            <a href="{{ route('admin.kitchen.index') }}" class="btn btn-warning rounded-5 px-3 me-2" style="background-color: #FF902A; border-color: #FF902A; color: white;">
+                <i class="fa fa-mug-hot me-1"></i> Kitchen Dashboard
+            </a>
             <span class="badge bg-secondary">Admin Area</span>
         </div>
     </div>
@@ -45,8 +48,10 @@
                                     @php
                                         $badges = [
                                             'pending' => 'bg-warning text-dark',
-                                            'processed' => 'bg-info text-white',
+                                            'preparing' => 'bg-info text-white',
+                                            'ready' => 'bg-primary text-white',
                                             'completed' => 'bg-success',
+                                            'processed' => 'bg-secondary text-white',
                                         ];
                                     @endphp
                                     <span class="badge {{ $badges[$order->status] ?? 'bg-secondary' }} rounded-pill px-3">

@@ -140,8 +140,10 @@
                             <label for="status" class="form-label">Current Status</label>
                             <select name="status" id="status" class="form-select">
                                 <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="processed" {{ $order->status == 'processed' ? 'selected' : '' }}>Processed</option>
+                                <option value="preparing" {{ $order->status == 'preparing' ? 'selected' : '' }}>Preparing</option>
+                                <option value="ready" {{ $order->status == 'ready' ? 'selected' : '' }}>Ready for Pickup</option>
                                 <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Completed</option>
+                                <option value="processed" {{ $order->status == 'processed' ? 'selected' : '' }}>Processed</option>
                             </select>
                         </div>
                         

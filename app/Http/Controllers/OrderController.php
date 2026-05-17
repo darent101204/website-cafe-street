@@ -88,6 +88,8 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
+            $trackingToken = \Illuminate\Support\Str::uuid()->toString();
+
             // Create Order
             $order = Order::create([
                 'name' => $request->name,
@@ -100,6 +102,7 @@ class OrderController extends Controller
                 'order_type' => $orderType,
                 'table_id' => $tableId,
                 'maps_link' => $mapsLink,
+                'tracking_token' => $trackingToken,
             ]);
 
             // Create Order Items
@@ -117,7 +120,7 @@ class OrderController extends Controller
             
             DB::commit();
 
-            return redirect()->route('checkout.success')->with('success', 'Order placed successfully!');
+            return redirect()->route('order.track', ['tracking_token' => $order->tracking_token])->with('success', 'Order placed successfully!');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -131,5 +134,25 @@ class OrderController extends Controller
     public function success()
     {
         return view('checkout.success');
+    }
+
+    /**
+     * Show customer order tracking page
+     */
+    public function track($tracking_token)
+    {
+        if (empty($tracking_token)) {
+            abort(404);
+        }
+
+        $order = Order::with('items.product', 'table')
+            ->where('tracking_token', $tracking_token)
+            ->first();
+
+        if (!$order) {
+            abort(404);
+        }
+
+        return view('checkout.track', compact('order'));
     }
 }

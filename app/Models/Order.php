@@ -20,6 +20,7 @@ class Order extends Model
         'order_type',
         'table_id',
         'maps_link',
+        'tracking_token',
     ];
 
     public function items()

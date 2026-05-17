@@ -17,10 +17,18 @@ class Order extends Model
         'total_price',
         'status',
         'user_id',
+        'order_type',
+        'table_id',
+        'maps_link',
     ];
 
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function table()
+    {
+        return $this->belongsTo(Table::class);
     }
 }

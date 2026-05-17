@@ -70,13 +70,19 @@ class OrderController extends Controller
             $total += $item['price'] * $item['quantity'];
         }
 
-        // Determine address content cleanly per approved specs (using neutral "-" placeholder for dine_in/takeaway)
+        // Determine order type, table_id, maps_link and address based on specs
+        $tableId = null;
+        $mapsLink = null;
         $address = '-';
-        if ($orderType === 'delivery') {
+
+        if ($orderType === 'dine_in') {
+            $tableId = session('table_id');
+        } elseif ($orderType === 'takeaway') {
+            // Keep default null/'-'
+        } else {
+            // Delivery
             $address = $request->address;
-            if ($request->filled('maps_link')) {
-                $address .= "\nMaps Link: " . $request->maps_link;
-            }
+            $mapsLink = $request->maps_link;
         }
 
         DB::beginTransaction();
@@ -91,6 +97,9 @@ class OrderController extends Controller
                 'total_price' => $total,
                 'status' => 'pending',
                 'user_id' => Auth::check() ? Auth::id() : null,
+                'order_type' => $orderType,
+                'table_id' => $tableId,
+                'maps_link' => $mapsLink,
             ]);
 
             // Create Order Items

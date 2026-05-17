@@ -84,6 +84,19 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
+                        <label class="text-muted small d-block">Order Type</label>
+                        @if(($order->order_type ?? 'takeaway') === 'dine_in')
+                            <span class="badge bg-warning text-dark"><i class="fa fa-utensils me-1"></i> Dine In</span>
+                            @if($order->table)
+                                <span class="fw-bold ms-1" style="color: #FF902A;">(Table {{ $order->table->table_number }})</span>
+                            @endif
+                        @elseif(($order->order_type ?? 'takeaway') === 'delivery')
+                            <span class="badge bg-info text-white"><i class="fa fa-truck me-1"></i> Delivery</span>
+                        @else
+                            <span class="badge bg-secondary text-white"><i class="fa fa-bag-shopping me-1"></i> Take Away</span>
+                        @endif
+                    </div>
+                    <div class="mb-3">
                         <label class="text-muted small">Full Name</label>
                         <p class="fw-bold mb-0">{{ $order->name }}</p>
                     </div>
@@ -95,6 +108,16 @@
                         <label class="text-muted small">Delivery Address</label>
                         <p class="mb-0">{{ $order->address }}</p>
                     </div>
+                    @if($order->maps_link)
+                        <div class="mb-3">
+                            <label class="text-muted small">Maps Location</label>
+                            <p class="mb-0">
+                                <a href="{{ $order->maps_link }}" target="_blank" class="text-decoration-none fw-bold" style="color: #FF902A;">
+                                    <i class="fa fa-map-location-dot me-1"></i> View on Google Maps
+                                </a>
+                            </p>
+                        </div>
+                    @endif
                     @if($order->notes)
                         <div class="mb-0">
                             <label class="text-muted small">Notes</label>

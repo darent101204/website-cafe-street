@@ -30,18 +30,35 @@
                         <h4 class="mb-0 text-muted">Customer Details</h4>
                     </div>
                     <div class="card-body">
+                        @if(session('order_type') === 'dine_in')
+                            <!-- Dine In Readonly Table Number -->
+                            <div class="mb-3">
+                                <label for="table_number" class="form-label">Table Number</label>
+                                <input type="text" class="form-control bg-light" id="table_number" value="Table {{ session('table_number') }}" readonly style="font-weight: bold; color: #FF902A;">
+                            </div>
+                        @endif
+
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required placeholder="John Doe">
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="John Doe" value="{{ Auth::check() ? Auth::user()->name : '' }}">
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone Number</label>
                             <input type="text" class="form-control" id="phone" name="phone" required placeholder="08123456789">
                         </div>
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Delivery Address</label>
-                            <textarea class="form-control" id="address" name="address" rows="3" required placeholder="Street name, number, city..."></textarea>
-                        </div>
+
+                        @if(session('order_type') === 'delivery')
+                            <!-- Delivery Address & Maps Link -->
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Delivery Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="3" required placeholder="Street name, number, city..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="maps_link" class="form-label">Maps Link (Google Maps URL)</label>
+                                <input type="url" class="form-control" id="maps_link" name="maps_link" placeholder="https://maps.google.com/...">
+                            </div>
+                        @endif
+
                         <div class="mb-3">
                             <label for="notes" class="form-label">Optional Notes</label>
                             <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="Less sugar, extra ice..."></textarea>

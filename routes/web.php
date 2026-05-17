@@ -40,6 +40,18 @@ Route::get('/table/{token}', [App\Http\Controllers\TableController::class, 'acce
 // Checkout routes
 Route::get('/checkout', [App\Http\Controllers\OrderController::class, 'create'])->name('checkout.index');
 Route::post('/checkout', [App\Http\Controllers\OrderController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/setup', function (\Illuminate\Http\Request $request) {
+    $orderType = $request->input('order_type', 'takeaway');
+    
+    // If a table QR was scanned, lock order type to dine_in
+    if (session()->has('table_id') && session()->has('table_number')) {
+        $orderType = 'dine_in';
+    }
+    
+    session(['order_type' => $orderType]);
+    
+    return redirect()->route('checkout.index');
+})->name('checkout.setup');
 Route::get('/checkout/success', [App\Http\Controllers\OrderController::class, 'success'])->name('checkout.success');
 
 // Admin routes (Middleware will be added to this group later)

@@ -20,6 +20,15 @@ class OrderController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty');
         }
 
+        // Defensive session fallback for order_type
+        if (!session()->has('order_type')) {
+            if (session()->has('table_id') && session()->has('table_number')) {
+                session(['order_type' => 'dine_in']);
+            } else {
+                session(['order_type' => 'takeaway']);
+            }
+        }
+
         $cart = session()->get('cart');
         $total = 0;
         
@@ -35,12 +44,20 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $orderType = session('order_type', 'takeaway');
+        
+        $rules = [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:500',
             'notes' => 'nullable|string|max:1000',
-        ]);
+        ];
+
+        if ($orderType === 'delivery') {
+            $rules['address'] = 'required|string|max:500';
+            $rules['maps_link'] = 'nullable|url|max:1000';
+        }
+
+        $request->validate($rules);
 
         $cart = session()->get('cart');
         
@@ -53,6 +70,15 @@ class OrderController extends Controller
             $total += $item['price'] * $item['quantity'];
         }
 
+        // Determine address content cleanly per approved specs (using neutral "-" placeholder for dine_in/takeaway)
+        $address = '-';
+        if ($orderType === 'delivery') {
+            $address = $request->address;
+            if ($request->filled('maps_link')) {
+                $address .= "\nMaps Link: " . $request->maps_link;
+            }
+        }
+
         DB::beginTransaction();
 
         try {
@@ -60,7 +86,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'name' => $request->name,
                 'phone' => $request->phone,
-                'address' => $request->address,
+                'address' => $address,
                 'notes' => $request->notes,
                 'total_price' => $total,
                 'status' => 'pending',

@@ -91,9 +91,42 @@
                         <a href="{{ route('products.index') }}" class="btn btn-outline-secondary w-100 mb-2 rounded-5">
                             Continue Shopping
                         </a>
-                        <a href="{{ route('checkout.index') }}" class="btn w-100 rounded-5" style="background-color: #FF902A; color: white;">
-                            Proceed to Checkout
-                        </a>
+                        <form action="{{ route('checkout.setup') }}" method="POST" class="mb-2">
+                            @csrf
+                            <h5 class="mt-4 mb-3" style="color: #6F4E37;">Choose Order Type</h5>
+                            
+                            @if(session()->has('table_number'))
+                                <!-- Dine In (Locked) -->
+                                <div class="alert alert-warning p-2 rounded-3 text-center mb-3">
+                                    <i class="fa fa-utensils me-1 text-warning"></i>
+                                    <strong>Dine In</strong> — Table {{ session('table_number') }}
+                                    <input type="hidden" name="order_type" value="dine_in">
+                                </div>
+                            @else
+                                <!-- Take Away / Delivery Selection -->
+                                <div class="form-check mb-2 text-start">
+                                    <input class="form-check-input" type="radio" name="order_type" id="order_type_takeaway" value="takeaway" 
+                                        {{ session('order_type', 'takeaway') === 'takeaway' ? 'checked' : '' }} onchange="toggleHelperText()">
+                                    <label class="form-check-label" for="order_type_takeaway">
+                                        <i class="fa fa-bag-shopping me-1 text-muted"></i> Take Away
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3 text-start">
+                                    <input class="form-check-input" type="radio" name="order_type" id="order_type_delivery" value="delivery"
+                                        {{ session('order_type') === 'delivery' ? 'checked' : '' }} onchange="toggleHelperText()">
+                                    <label class="form-check-label" for="order_type_delivery">
+                                        <i class="fa fa-truck me-1 text-muted"></i> Delivery
+                                    </label>
+                                    <small id="delivery_helper" class="d-block text-muted mt-1 {{ session('order_type') === 'delivery' ? '' : 'd-none' }}" style="font-size: 0.85rem;">
+                                        <i class="fa fa-info-circle text-warning me-1"></i> Delivery address will be required at checkout
+                                    </small>
+                                </div>
+                            @endif
+
+                            <button type="submit" class="btn w-100 rounded-5" style="background-color: #FF902A; color: white;">
+                                Proceed to Checkout
+                            </button>
+                        </form>
                         <form action="{{ route('cart.clear') }}" method="POST" class="mt-3">
                             @csrf
                             @method('DELETE')
@@ -120,4 +153,20 @@
         </div>
     @endif
 </div>
+@push('scripts')
+<script>
+    function toggleHelperText() {
+        const deliveryRadio = document.getElementById('order_type_delivery');
+        const helperText = document.getElementById('delivery_helper');
+        if (deliveryRadio && helperText) {
+            if (deliveryRadio.checked) {
+                helperText.classList.remove('d-none');
+            } else {
+                helperText.classList.add('d-none');
+            }
+        }
+    }
+</script>
+@endpush
+
 @endsection

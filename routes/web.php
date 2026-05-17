@@ -32,3 +32,6 @@ Route::post('/cart/add/{id}', [App\Http\Controllers\CartController::class, 'add'
 Route::patch('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/remove', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+
+// Table QR routing
+Route::get('/table/{token}', [App\Http\Controllers\TableController::class, 'access'])->name('table.access');

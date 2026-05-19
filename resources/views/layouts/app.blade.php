@@ -67,6 +67,7 @@
                             </a>
                             <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
                                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ route('order.history') }}">Order History</a></li>
                                 @if(Auth::user()->role === 'admin')
                                     <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">Dashboard</a></li>
                                 @endif

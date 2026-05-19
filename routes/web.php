@@ -81,6 +81,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/orders/history', [App\Http\Controllers\OrderController::class, 'history'])->name('order.history');
+    Route::post('/orders/reorder/{order}', [App\Http\Controllers\OrderController::class, 'reorder'])->name('order.reorder');
+    Route::post('/products/{product}/favorite', [App\Http\Controllers\ProductController::class, 'toggleFavorite'])->name('products.favorite');
 });
 
 require __DIR__.'/auth.php';

@@ -34,13 +34,26 @@
                         <div class="col-lg-3 mt-3">
                             <div class="card text-center border-5 shadow-lg" style="border-color: #F6EBDA;">
                                 <div class="card-body">
-                                    @if(file_exists(public_path('images/' . $product->image)))
-                                        <img src="{{ asset('images/' . $product->image) }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
-                                    @elseif(file_exists(public_path('images/products/' . $product->image)))
-                                        <img src="{{ asset('images/products/' . $product->image) }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
-                                    @else
-                                        <img src="{{ asset('images/img_product.png') }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
-                                    @endif
+                                    <div class="position-relative">
+                                        @auth
+                                            @php
+                                                $isFavorited = \App\Models\Favorite::where('user_id', Auth::id())->where('product_id', $product->id)->exists();
+                                            @endphp
+                                            <form action="{{ route('products.favorite', $product->id) }}" method="POST" class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-light rounded-circle shadow" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fa-solid fa-heart" style="color: {{ $isFavorited ? '#dc3545' : '#dee2e6' }}; font-size: 1.1rem;"></i>
+                                                </button>
+                                            </form>
+                                        @endauth
+                                        @if(file_exists(public_path('images/' . $product->image)))
+                                            <img src="{{ asset('images/' . $product->image) }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
+                                        @elseif(file_exists(public_path('images/products/' . $product->image)))
+                                            <img src="{{ asset('images/products/' . $product->image) }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
+                                        @else
+                                            <img src="{{ asset('images/img_product.png') }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
+                                        @endif
+                                    </div>
                                     <div class="mt-2 row justify-content-between">
                                         <div class="col-8 text-start">
                                             <h5><b>{{ $product->name }}</b></h5>
@@ -156,6 +169,17 @@
                             <div class="card text-center border-light shadow-lg">
                                 <div class="card-body">
                                     <div class="image-wrapper position-relative">
+                                        @auth
+                                            @php
+                                                $isFavorited = \App\Models\Favorite::where('user_id', Auth::id())->where('product_id', $product->id)->exists();
+                                            @endphp
+                                            <form action="{{ route('products.favorite', $product->id) }}" method="POST" class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-light rounded-circle shadow" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fa-solid fa-heart" style="color: {{ $isFavorited ? '#dc3545' : '#dee2e6' }}; font-size: 1.1rem;"></i>
+                                                </button>
+                                            </form>
+                                        @endauth
                                         @if(file_exists(public_path('images/' . $product->image)))
                                             <img src="{{ asset('images/' . $product->image) }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
                                         @elseif(file_exists(public_path('images/products/' . $product->image)))

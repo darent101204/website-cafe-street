@@ -346,4 +346,63 @@ class OrderController extends Controller
 
         return $pdf->download('invoice-order-' . $order->id . '.pdf');
     }
+
+    /**
+     * Show customer order history dashboard and favorites
+     */
+    public function history()
+    {
+        $orders = Order::with(['items.product', 'table'])
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->paginate(10);
+
+        $favorites = \App\Models\Favorite::with('product')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view('checkout.history', compact('orders', 'favorites'));
+    }
+
+    /**
+     * Reorder a past order
+     */
+    public function reorder(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $order->load('items.product');
+
+        $cart = [];
+        foreach ($order->items as $item) {
+            // Only add if product still exists
+            if ($item->product) {
+                $cart[$item->product_id] = [
+                    "name" => $item->product->name,
+                    "quantity" => $item->quantity,
+                    "price" => $item->product->price, // Use current price, not past price
+                    "image" => $item->product->image,
+                    "description" => $item->product->description
+                ];
+            }
+        }
+
+        if (empty($cart)) {
+            return redirect()->back()->with('error', 'Products from this order are no longer available.');
+        }
+
+        session()->put('cart', $cart);
+
+        // Preserve order type if it's delivery or takeaway, default to takeaway for dine-in to avoid table mismatch
+        if (in_array($order->order_type, ['takeaway', 'delivery'])) {
+            session(['order_type' => $order->order_type]);
+        } else {
+            session(['order_type' => 'takeaway']);
+        }
+
+        return redirect()->route('cart.index')->with('success', 'Order items successfully added to your cart for reordering!');
+    }
 }

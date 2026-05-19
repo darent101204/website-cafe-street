@@ -32,6 +32,17 @@
                 <div class="card text-center border-light shadow-lg h-100">
                     <div class="card-body d-flex flex-column">
                         <div class="image-wrapper position-relative mb-3">
+                            @auth
+                                @php
+                                    $isFavorited = \App\Models\Favorite::where('user_id', Auth::id())->where('product_id', $product->id)->exists();
+                                @endphp
+                                <form action="{{ route('products.favorite', $product->id) }}" method="POST" class="position-absolute" style="top: 10px; left: 10px; z-index: 10;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-light rounded-circle shadow" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fa-solid fa-heart" style="color: {{ $isFavorited ? '#dc3545' : '#dee2e6' }}; font-size: 1.1rem;"></i>
+                                    </button>
+                                </form>
+                            @endauth
                             @if(file_exists(public_path('images/' . $product->image)))
                                 <img src="{{ asset('images/' . $product->image) }}" class="rounded-3 img-fluid w-100" style="height: 200px; object-fit: cover;" alt="{{ $product->name }}">
                             @elseif(file_exists(public_path('images/products/' . $product->image)))

@@ -119,4 +119,27 @@ class ProductController extends Controller
         return redirect()->route('products.index')
             ->with('success', 'Product deleted successfully!');
     }
+
+    /**
+     * Toggle product favorite status for authenticated user
+     */
+    public function toggleFavorite(Product $product)
+    {
+        $userId = \Illuminate\Support\Facades\Auth::id();
+        
+        $favorite = \App\Models\Favorite::where('user_id', $userId)
+                                        ->where('product_id', $product->id)
+                                        ->first();
+
+        if ($favorite) {
+            $favorite->delete();
+            return redirect()->back()->with('success', $product->name . ' removed from favorites! 💔');
+        } else {
+            \App\Models\Favorite::create([
+                'user_id' => $userId,
+                'product_id' => $product->id
+            ]);
+            return redirect()->back()->with('success', $product->name . ' added to favorites! ❤️');
+        }
+    }
 }

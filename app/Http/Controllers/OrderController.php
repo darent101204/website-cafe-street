@@ -138,7 +138,7 @@ class OrderController extends Controller
                         'first_name' => $request->name,
                         'phone' => $request->phone,
                     ],
-                    'enabled_payments' => ['qris'],
+                    'enabled_payments' => ['qris', 'gopay', 'shopeepay'],
                 ];
 
                 // Generate Snap Token

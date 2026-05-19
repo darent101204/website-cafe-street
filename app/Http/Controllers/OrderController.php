@@ -132,7 +132,7 @@ class OrderController extends Controller
                 $params = [
                     'transaction_details' => [
                         'order_id' => $midtransOrderId,
-                        'gross_amount' => (int) ($total * 1000),
+                        'gross_amount' => (int) $total,
                     ],
                     'customer_details' => [
                         'first_name' => $request->name,

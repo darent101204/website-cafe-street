@@ -294,13 +294,13 @@
                                     <tr class="border-bottom">
                                         <td class="ps-0 py-3" style="width: 70%;">
                                             <h6 class="fw-bold mb-0">{{ $item->product->name ?? 'Unknown Product' }}</h6>
-                                            <span class="text-muted small">Rp {{ number_format($item->price * 1000, 0, ',', '.') }}</span>
+                                            <span class="text-muted small">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
                                         </td>
                                         <td class="text-center py-3 text-muted">
                                             x{{ $item->quantity }}
                                         </td>
                                         <td class="text-end pe-0 py-3 fw-bold">
-                                            Rp {{ number_format($item->price * $item->quantity * 1000, 0, ',', '.') }}
+                                            Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -317,7 +317,7 @@
 
                     <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
                         <h5 class="fw-bold mb-0">Total Amount</h5>
-                        <h4 class="fw-bold mb-0" style="color: #FF902A;">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</h4>
+                        <h4 class="fw-bold mb-0" style="color: #FF902A;">Rp {{ number_format($order->total_price, 0, ',', '.') }}</h4>
                     </div>
                 </div>
             </div>

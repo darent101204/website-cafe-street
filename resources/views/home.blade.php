@@ -59,7 +59,7 @@
                                             <h5><b>{{ $product->name }}</b></h5>
                                         </div>
                                         <div class="col-4">
-                                            <h5><b>Rp {{ number_format($product->price * 1000, 0, ',', '.') }}</b></h5>
+                                            <h5><b>Rp {{ number_format($product->price, 0, ',', '.') }}</b></h5>
                                         </div>
                                     </div>
                                     <div class="mt-2 row justify-content-between">
@@ -196,7 +196,7 @@
                                             <h5><b>{{ $product->name }}</b></h5>
                                         </div>
                                         <div class="col-3">
-                                            <h5><b>Rp {{ number_format($product->price * 1000, 0, ',', '.') }}</b></h5>
+                                            <h5><b>Rp {{ number_format($product->price, 0, ',', '.') }}</b></h5>
                                         </div>
                                     </div>
                                     <div class="row justify-content-between">

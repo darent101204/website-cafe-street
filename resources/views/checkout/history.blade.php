@@ -47,7 +47,7 @@
                                     @endif
                                     <div style="flex: 1; min-width: 0;">
                                         <h6 class="fw-bold mb-1 text-truncate">{{ $favorite->product->name }}</h6>
-                                        <span class="text-muted small">Rp {{ number_format($favorite->product->price * 1000, 0, ',', '.') }}</span>
+                                        <span class="text-muted small">Rp {{ number_format($favorite->product->price, 0, ',', '.') }}</span>
                                     </div>
                                     <div class="ms-2">
                                         <form action="{{ route('products.favorite', $favorite->product_id) }}" method="POST">
@@ -135,7 +135,7 @@
                             </div>
                             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                                 <span class="text-muted small d-block mb-1">Total Amount</span>
-                                <h5 class="fw-bold mb-0" style="color: #FF902A;">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</h5>
+                                <h5 class="fw-bold mb-0" style="color: #FF902A;">Rp {{ number_format($order->total_price, 0, ',', '.') }}</h5>
                             </div>
                         </div>
                     </div>

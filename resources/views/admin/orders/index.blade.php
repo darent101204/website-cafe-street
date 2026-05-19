@@ -357,7 +357,7 @@
                 <div class="breakdown-item">
                     <span class="breakdown-label">Avg. Order Value</span>
                     <span class="breakdown-val" style="color:#FF902A;">
-                        Rp {{ $safeTotal > 0 ? number_format(($totalRevenue / $paidOrders ?: 1), 0, ',', '.') : '0' }}
+                        Rp {{ $paidOrders > 0 ? number_format($totalRevenue / $paidOrders, 0, ',', '.') : '0' }}
                     </span>
                 </div>
             </div>
@@ -375,7 +375,7 @@
             ->orderBy('date')
             ->get()
             ->mapWithKeys(function ($item) {
-                return [\Carbon\Carbon::parse($item->date)->format('D') => $item->total * 1000];
+                return [\Carbon\Carbon::parse($item->date)->format('D') => $item->total];
             });
 
         $chartLabels = [];
@@ -415,8 +415,8 @@
             ->get();
 
         // Advanced Payment Insights: Cash vs QRIS Revenue
-        $cashRevenue = \App\Models\Order::where('payment_method', 'cash')->where('payment_status', 'paid')->sum('total_price') * 1000;
-        $qrisRevenue = \App\Models\Order::where('payment_method', 'online')->where('payment_status', 'paid')->sum('total_price') * 1000;
+        $cashRevenue = \App\Models\Order::where('payment_method', 'cash')->where('payment_status', 'paid')->sum('total_price');
+        $qrisRevenue = \App\Models\Order::where('payment_method', 'online')->where('payment_status', 'paid')->sum('total_price');
         $totalRev = $cashRevenue + $qrisRevenue;
         $cashPct = $totalRev > 0 ? round(($cashRevenue / $totalRev) * 100) : 0;
         $qrisPct = $totalRev > 0 ? round(($qrisRevenue / $totalRev) * 100) : 0;
@@ -562,7 +562,7 @@
                                 <td>#{{ $order->id }}</td>
                                 <td>{{ $order->name }}</td>
                                 <td>{{ $order->created_at->format('d M Y H:i') }}</td>
-                                <td>Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                                 <td>
                                     @php
                                         $badges = [

@@ -38,7 +38,7 @@
                                     <p class="text-muted mb-0">{{ Str::limit($details['description'], 50) }}</p>
                                 </div>
                                 <div class="col-md-2 text-center">
-                                    <h5 class="mb-0"><b>Rp {{ number_format($details['price'] * 1000, 0, ',', '.') }}</b></h5>
+                                    <h5 class="mb-0"><b>Rp {{ number_format($details['price'], 0, ',', '.') }}</b></h5>
                                 </div>
                                 <div class="col-md-2 text-center">
                                     <form action="{{ route('cart.update') }}" method="POST" class="d-inline">
@@ -77,7 +77,7 @@
                         <hr>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal:</span>
-                            <span><b>Rp {{ number_format($total * 1000, 0, ',', '.') }}</b></span>
+                            <span><b>Rp {{ number_format($total, 0, ',', '.') }}</b></span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Delivery:</span>
@@ -86,7 +86,7 @@
                         <hr>
                         <div class="d-flex justify-content-between mb-4">
                             <h5><b>Total:</b></h5>
-                            <h5><b style="color: #FF902A;">Rp {{ number_format($total * 1000, 0, ',', '.') }}</b></h5>
+                            <h5><b style="color: #FF902A;">Rp {{ number_format($total, 0, ',', '.') }}</b></h5>
                         </div>
                         <a href="{{ route('products.index') }}" class="btn btn-outline-secondary w-100 mb-2 rounded-5">
                             Continue Shopping

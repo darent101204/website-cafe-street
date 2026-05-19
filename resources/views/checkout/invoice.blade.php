@@ -369,8 +369,8 @@
                 <tr class="{{ $i % 2 === 1 ? 'even' : '' }}">
                     <td class="item-name">{{ $item->product->name ?? 'Unknown Item' }}</td>
                     <td class="center">{{ $item->quantity }}</td>
-                    <td class="right">Rp {{ number_format($item->price * 1000, 0, ',', '.') }}</td>
-                    <td class="subtotal">Rp {{ number_format($item->price * $item->quantity * 1000, 0, ',', '.') }}</td>
+                    <td class="right">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+                    <td class="subtotal">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -386,14 +386,14 @@
             <td class="totals-spacer"></td>
             <td class="totals-box">
                 <table class="totals-row" style="width:100%;">
-                    <tr><td>Subtotal</td><td class="right">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</td></tr>
+                    <tr><td>Subtotal</td><td class="right">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td></tr>
                     <tr><td>Tax (0%)</td><td class="right">Rp 0</td></tr>
                     <tr><td>Delivery</td><td class="right">Free</td></tr>
                 </table>
                 <table class="totals-grand" style="width:100%;">
                     <tr>
                         <td class="label">Total Due</td>
-                        <td class="amount">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</td>
+                        <td class="amount">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                     </tr>
                 </table>
             </td>

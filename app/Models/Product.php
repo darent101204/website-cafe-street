@@ -30,7 +30,7 @@ class Product extends Model
      */
     public function getFormattedPriceAttribute()
     {
-        return number_format($this->price, 0) . ' K';
+        return number_format($this->price / 1000, 0) . ' K';
     }
 
     /**

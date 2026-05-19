@@ -17,7 +17,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Vanilla Latte',
                 'description' => 'Smooth vanilla latte with premium coffee beans',
-                'price' => 21,
+                'price' => 21000,
                 'image' => 'vanilla.png',
                 'rating' => 4.5,
                 'category' => 'hot',
@@ -26,7 +26,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Espresso',
                 'description' => 'Strong and bold espresso shot',
-                'price' => 21,
+                'price' => 21000,
                 'image' => 'espresso.png',
                 'rating' => 4.5,
                 'category' => 'hot',
@@ -35,7 +35,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Hazelnut Latte',
                 'description' => 'Rich hazelnut flavored latte',
-                'price' => 21,
+                'price' => 21000,
                 'image' => 'hazelnut.png',
                 'rating' => 4.5,
                 'category' => 'hot',
@@ -44,7 +44,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Sandwich',
                 'description' => 'Bread with meat and vegetables',
-                'price' => 12,
+                'price' => 12000,
                 'image' => 'img_product.png',
                 'rating' => 4.5,
                 'category' => 'hot',
@@ -53,7 +53,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Hot Milk',
                 'description' => 'Hot milk with less sugar',
-                'price' => 12,
+                'price' => 12000,
                 'image' => 'hot-milk.png',
                 'rating' => 4.5,
                 'category' => 'hot',
@@ -62,7 +62,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Coffee Ice Cream',
                 'description' => 'Coffee ice cream with chocolate',
-                'price' => 12,
+                'price' => 12000,
                 'image' => 'ice_cream.png',
                 'rating' => 4.5,
                 'category' => 'cold',
@@ -71,7 +71,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Cappuccino',
                 'description' => 'Classic cappuccino with foam',
-                'price' => 12,
+                'price' => 12000,
                 'image' => 'cappuciono.png',
                 'rating' => 4.5,
                 'category' => 'hot',
@@ -80,7 +80,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Mocca',
                 'description' => 'Chocolate coffee blend',
-                'price' => 12,
+                'price' => 12000,
                 'image' => 'mocca.png',
                 'rating' => 4.5,
                 'category' => 'hot',
@@ -89,7 +89,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Waffle Ice Cream',
                 'description' => 'Crispy waffle with ice cream',
-                'price' => 12,
+                'price' => 12000,
                 'image' => 'waffle.png',
                 'rating' => 4.5,
                 'category' => 'cold',

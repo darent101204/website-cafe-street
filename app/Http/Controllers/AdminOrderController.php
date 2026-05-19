@@ -16,9 +16,9 @@ class AdminOrderController extends Controller
 
         // ── Analytics KPIs (read-only, additive) ──────────────────────────
         $totalOrders      = Order::count();
-        $totalRevenue     = Order::where('payment_status', 'paid')->sum('total_price') * 1000;
+        $totalRevenue     = Order::where('payment_status', 'paid')->sum('total_price');
         $todayOrders      = Order::whereDate('created_at', today())->count();
-        $todayRevenue     = Order::whereDate('created_at', today())->where('payment_status', 'paid')->sum('total_price') * 1000;
+        $todayRevenue     = Order::whereDate('created_at', today())->where('payment_status', 'paid')->sum('total_price');
         $pendingOrders    = Order::where('status', 'pending')->count();
         $completedOrders  = Order::where('status', 'completed')->count();
         $paidOrders       = Order::where('payment_status', 'paid')->count();

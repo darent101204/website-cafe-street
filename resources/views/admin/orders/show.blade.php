@@ -63,16 +63,16 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center">Rp {{ number_format($item->price * 1000, 0, ',', '.') }}</td>
+                                        <td class="text-center">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
                                         <td class="text-center">{{ $item->quantity }}</td>
-                                        <td class="text-end fw-bold">Rp {{ number_format($item->price * $item->quantity * 1000, 0, ',', '.') }}</td>
+                                        <td class="text-end fw-bold">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                             <tfoot class="bg-light">
                                 <tr>
                                     <td colspan="3" class="text-end"><strong>Total Amount</strong></td>
-                                    <td class="text-end"><h4 style="color: #FF902A;"><strong>Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</strong></h4></td>
+                                    <td class="text-end"><h4 style="color: #FF902A;"><strong>Rp {{ number_format($order->total_price, 0, ',', '.') }}</strong></h4></td>
                                 </tr>
                             </tfoot>
                         </table>

@@ -62,7 +62,7 @@
                                 <h5 class="mb-0 text-truncate" title="{{ $product->name }}"><b>{{ $product->name }}</b></h5>
                             </div>
                             <div class="col-4 text-end">
-                                <h6 class="mb-0 fw-bold text-nowrap">Rp {{ number_format($product->price * 1000, 0, ',', '.') }}</h6>
+                                <h6 class="mb-0 fw-bold text-nowrap">Rp {{ number_format($product->price, 0, ',', '.') }}</h6>
                             </div>
                         </div>
 

@@ -96,21 +96,40 @@
                             @php
                                 $statusClasses = [
                                     'pending' => 'bg-warning text-dark',
+                                    'confirmed' => 'bg-primary text-white',
                                     'preparing' => 'bg-info text-white',
-                                    'ready' => 'bg-primary text-white',
+                                    'brewing' => 'bg-info text-white',
+                                    'ready' => 'bg-success text-white',
+                                    'on_delivery' => 'bg-info text-white',
                                     'completed' => 'bg-success text-white',
+                                    'cancelled' => 'bg-danger text-white',
                                     'processed' => 'bg-secondary text-white',
                                 ];
                                 $statusIcon = [
-                                    'pending' => 'fa-inbox',
+                                    'pending' => 'fa-clock',
+                                    'confirmed' => 'fa-thumbs-up',
                                     'preparing' => 'fa-mug-hot',
+                                    'brewing' => 'fa-mug-hot',
                                     'ready' => 'fa-bell',
+                                    'on_delivery' => 'fa-truck',
                                     'completed' => 'fa-circle-check',
+                                    'cancelled' => 'fa-circle-xmark',
                                     'processed' => 'fa-spinner',
+                                ];
+                                $statusLabel = [
+                                    'pending' => 'Pending',
+                                    'confirmed' => 'Confirmed',
+                                    'preparing' => 'Brewing',
+                                    'brewing' => 'Brewing',
+                                    'ready' => 'Ready',
+                                    'on_delivery' => 'On Delivery',
+                                    'completed' => 'Completed',
+                                    'cancelled' => 'Cancelled',
+                                    'processed' => 'Processed',
                                 ];
                             @endphp
                             <span class="badge {{ $statusClasses[$order->status] ?? 'bg-secondary' }} py-2 px-3 rounded-pill">
-                                <i class="fa {{ $statusIcon[$order->status] ?? 'fa-circle' }} me-1"></i> {{ ucfirst($order->status) }}
+                                <i class="fa {{ $statusIcon[$order->status] ?? 'fa-circle' }} me-1"></i> {{ $statusLabel[$order->status] ?? ucfirst($order->status) }}
                             </span>
                         </div>
                     </div>

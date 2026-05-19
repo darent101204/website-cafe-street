@@ -129,7 +129,7 @@
                         </div>
                         <h6 class="fw-bold mb-2">{{ $order->name }}</h6>
                         
-                        <div class="mb-2">
+                        <div class="mb-2 d-flex flex-wrap gap-1">
                             @if(($order->order_type ?? 'takeaway') === 'dine_in')
                                 <span class="badge bg-warning text-dark"><i class="fa fa-utensils me-1"></i> Dine In — Table {{ $order->table->table_number ?? 'N/A' }}</span>
                             @elseif(($order->order_type ?? 'takeaway') === 'delivery')
@@ -137,6 +137,34 @@
                             @else
                                 <span class="badge bg-secondary text-white"><i class="fa fa-bag-shopping me-1"></i> Take Away</span>
                             @endif
+
+                            @php
+                                $statusBadges = [
+                                    'pending' => 'bg-secondary text-white',
+                                    'confirmed' => 'bg-primary text-white',
+                                    'preparing' => 'bg-info text-white',
+                                    'brewing' => 'bg-info text-white',
+                                    'ready' => 'bg-success text-white',
+                                    'on_delivery' => 'bg-info text-white',
+                                    'completed' => 'bg-success text-white',
+                                    'cancelled' => 'bg-danger text-white',
+                                    'processed' => 'bg-secondary text-white',
+                                ];
+                                $statusLabels = [
+                                    'pending' => '⏳ Pending',
+                                    'confirmed' => '👍 Confirmed',
+                                    'preparing' => '🍳 Preparing',
+                                    'brewing' => '☕ Brewing',
+                                    'ready' => '🔔 Ready',
+                                    'on_delivery' => '🚚 On Delivery',
+                                    'completed' => '✅ Completed',
+                                    'cancelled' => '❌ Cancelled',
+                                    'processed' => '⚙️ Processed',
+                                ];
+                            @endphp
+                            <span class="badge {{ $statusBadges[$order->status] ?? 'bg-secondary' }}">
+                                {{ $statusLabels[$order->status] ?? ucfirst($order->status) }}
+                            </span>
                         </div>
 
                         <hr class="my-2" style="border-style: dashed;">
@@ -161,9 +189,9 @@
                             <form action="{{ route('admin.kitchen.status', $order) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('PATCH')
-                                <input type="hidden" name="status" value="preparing">
+                                <input type="hidden" name="status" value="brewing">
                                 <button type="submit" class="btn btn-sm text-white rounded-5 px-3" style="background-color: #FF902A; font-size: 0.75rem;">
-                                    Start Preparing 🍳
+                                    Start Brewing ☕
                                 </button>
                             </form>
                         </div>
@@ -177,10 +205,10 @@
             </div>
         </div>
 
-        <!-- 2. PREPARING COLUMN -->
+        <!-- 2. BREWING COLUMN -->
         <div class="kanban-col">
             <div class="kanban-col-header kanban-col-preparing">
-                <span>🍳 Preparing</span>
+                <span>🍳 Brewing</span>
                 <span class="badge bg-dark rounded-pill">{{ $preparing->count() }}</span>
             </div>
             <div class="kanban-cards-wrapper">
@@ -192,7 +220,7 @@
                         </div>
                         <h6 class="fw-bold mb-2">{{ $order->name }}</h6>
                         
-                        <div class="mb-2">
+                        <div class="mb-2 d-flex flex-wrap gap-1">
                             @if(($order->order_type ?? 'takeaway') === 'dine_in')
                                 <span class="badge bg-warning text-dark"><i class="fa fa-utensils me-1"></i> Dine In — Table {{ $order->table->table_number ?? 'N/A' }}</span>
                             @elseif(($order->order_type ?? 'takeaway') === 'delivery')
@@ -200,6 +228,34 @@
                             @else
                                 <span class="badge bg-secondary text-white"><i class="fa fa-bag-shopping me-1"></i> Take Away</span>
                             @endif
+
+                            @php
+                                $statusBadges = [
+                                    'pending' => 'bg-secondary text-white',
+                                    'confirmed' => 'bg-primary text-white',
+                                    'preparing' => 'bg-info text-white',
+                                    'brewing' => 'bg-info text-white',
+                                    'ready' => 'bg-success text-white',
+                                    'on_delivery' => 'bg-info text-white',
+                                    'completed' => 'bg-success text-white',
+                                    'cancelled' => 'bg-danger text-white',
+                                    'processed' => 'bg-secondary text-white',
+                                ];
+                                $statusLabels = [
+                                    'pending' => '⏳ Pending',
+                                    'confirmed' => '👍 Confirmed',
+                                    'preparing' => '🍳 Preparing',
+                                    'brewing' => '☕ Brewing',
+                                    'ready' => '🔔 Ready',
+                                    'on_delivery' => '🚚 On Delivery',
+                                    'completed' => '✅ Completed',
+                                    'cancelled' => '❌ Cancelled',
+                                    'processed' => '⚙️ Processed',
+                                ];
+                            @endphp
+                            <span class="badge {{ $statusBadges[$order->status] ?? 'bg-secondary' }}">
+                                {{ $statusLabels[$order->status] ?? ucfirst($order->status) }}
+                            </span>
                         </div>
 
                         <hr class="my-2" style="border-style: dashed;">
@@ -255,7 +311,7 @@
                         </div>
                         <h6 class="fw-bold mb-2">{{ $order->name }}</h6>
                         
-                        <div class="mb-2">
+                        <div class="mb-2 d-flex flex-wrap gap-1">
                             @if(($order->order_type ?? 'takeaway') === 'dine_in')
                                 <span class="badge bg-warning text-dark"><i class="fa fa-utensils me-1"></i> Dine In — Table {{ $order->table->table_number ?? 'N/A' }}</span>
                             @elseif(($order->order_type ?? 'takeaway') === 'delivery')
@@ -263,6 +319,34 @@
                             @else
                                 <span class="badge bg-secondary text-white"><i class="fa fa-bag-shopping me-1"></i> Take Away</span>
                             @endif
+
+                            @php
+                                $statusBadges = [
+                                    'pending' => 'bg-secondary text-white',
+                                    'confirmed' => 'bg-primary text-white',
+                                    'preparing' => 'bg-info text-white',
+                                    'brewing' => 'bg-info text-white',
+                                    'ready' => 'bg-success text-white',
+                                    'on_delivery' => 'bg-info text-white',
+                                    'completed' => 'bg-success text-white',
+                                    'cancelled' => 'bg-danger text-white',
+                                    'processed' => 'bg-secondary text-white',
+                                ];
+                                $statusLabels = [
+                                    'pending' => '⏳ Pending',
+                                    'confirmed' => '👍 Confirmed',
+                                    'preparing' => '🍳 Preparing',
+                                    'brewing' => '☕ Brewing',
+                                    'ready' => '🔔 Ready',
+                                    'on_delivery' => '🚚 On Delivery',
+                                    'completed' => '✅ Completed',
+                                    'cancelled' => '❌ Cancelled',
+                                    'processed' => '⚙️ Processed',
+                                ];
+                            @endphp
+                            <span class="badge {{ $statusBadges[$order->status] ?? 'bg-secondary' }}">
+                                {{ $statusLabels[$order->status] ?? ucfirst($order->status) }}
+                            </span>
                         </div>
 
                         <hr class="my-2" style="border-style: dashed;">
@@ -318,7 +402,7 @@
                         </div>
                         <h6 class="fw-bold mb-2 text-decoration-line-through">{{ $order->name }}</h6>
                         
-                        <div class="mb-2">
+                        <div class="mb-2 d-flex flex-wrap gap-1">
                             @if(($order->order_type ?? 'takeaway') === 'dine_in')
                                 <span class="badge bg-warning text-dark"><i class="fa fa-utensils me-1"></i> Dine In — Table {{ $order->table->table_number ?? 'N/A' }}</span>
                             @elseif(($order->order_type ?? 'takeaway') === 'delivery')
@@ -326,6 +410,34 @@
                             @else
                                 <span class="badge bg-secondary text-white"><i class="fa fa-bag-shopping me-1"></i> Take Away</span>
                             @endif
+
+                            @php
+                                $statusBadges = [
+                                    'pending' => 'bg-secondary text-white',
+                                    'confirmed' => 'bg-primary text-white',
+                                    'preparing' => 'bg-info text-white',
+                                    'brewing' => 'bg-info text-white',
+                                    'ready' => 'bg-success text-white',
+                                    'on_delivery' => 'bg-info text-white',
+                                    'completed' => 'bg-success text-white',
+                                    'cancelled' => 'bg-danger text-white',
+                                    'processed' => 'bg-secondary text-white',
+                                ];
+                                $statusLabels = [
+                                    'pending' => '⏳ Pending',
+                                    'confirmed' => '👍 Confirmed',
+                                    'preparing' => '🍳 Preparing',
+                                    'brewing' => '☕ Brewing',
+                                    'ready' => '🔔 Ready',
+                                    'on_delivery' => '🚚 On Delivery',
+                                    'completed' => '✅ Completed',
+                                    'cancelled' => '❌ Cancelled',
+                                    'processed' => '⚙️ Processed',
+                                ];
+                            @endphp
+                            <span class="badge {{ $statusBadges[$order->status] ?? 'bg-secondary' }}">
+                                {{ $statusLabels[$order->status] ?? ucfirst($order->status) }}
+                            </span>
                         </div>
 
                         <hr class="my-2" style="border-style: dashed;">

@@ -14,7 +14,7 @@ class KitchenController extends Controller
     {
         // Load active orders grouped by operational status and filtered by payment visibility rules
         $orders = Order::with('items.product', 'table')
-            ->whereIn('status', ['pending', 'preparing', 'ready', 'completed'])
+            ->whereIn('status', ['pending', 'confirmed', 'preparing', 'brewing', 'processed', 'ready', 'on_delivery', 'completed'])
             ->where(function ($query) {
                 // Show cash orders that are pending cash payment confirmation
                 $query->where(function ($q) {
@@ -29,9 +29,9 @@ class KitchenController extends Controller
             ->latest()
             ->get();
 
-        $pending = $orders->where('status', 'pending');
-        $preparing = $orders->where('status', 'preparing');
-        $ready = $orders->where('status', 'ready');
+        $pending = $orders->whereIn('status', ['pending', 'confirmed']);
+        $preparing = $orders->whereIn('status', ['brewing', 'preparing', 'processed']);
+        $ready = $orders->whereIn('status', ['ready', 'on_delivery']);
         
         // Limit recent completed orders to the latest 15 to prevent dashboard clutter
         $completed = $orders->where('status', 'completed')->take(15);
@@ -51,15 +51,20 @@ class KitchenController extends Controller
         $currentStatus = $order->status;
         $targetStatus = $request->status;
 
-        // Strict sequential transition guard mapping
+        // Strict sequential transition guard mapping supporting expanded tracking statuses
         $validTransitions = [
-            'pending' => 'preparing',
-            'preparing' => 'ready',
-            'ready' => 'completed',
+            'pending' => ['brewing', 'preparing'],
+            'confirmed' => ['brewing', 'preparing'],
+            'preparing' => ['ready'],
+            'processed' => ['ready'],
+            'brewing' => ['ready'],
+            'ready' => ['completed'],
+            'on_delivery' => ['completed'],
         ];
 
         // Validate sequential flow
-        if (!isset($validTransitions[$currentStatus]) || $validTransitions[$currentStatus] !== $targetStatus) {
+        $allowedTargets = $validTransitions[$currentStatus] ?? [];
+        if (!in_array($targetStatus, $allowedTargets)) {
             return redirect()->back()->with('error', sprintf(
                 'Invalid transition! Order #%d is currently "%s" and cannot be transitioned directly to "%s".',
                 $order->id,

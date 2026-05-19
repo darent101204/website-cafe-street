@@ -11,7 +11,7 @@
     <style>
         .progress-stepper {
             display: flex;
-            justify-content: justify;
+            justify-content: space-between;
             position: relative;
             margin: 2rem 0;
             padding: 0;
@@ -184,21 +184,30 @@
                     <!-- Dynamic Status Description Callout -->
                     <div class="text-center mb-5">
                         @if($order->status === 'pending')
-                            <h2 class="fw-bold mb-2">🟡 Pending</h2>
+                            <h2 class="fw-bold mb-2" style="color: #FF902A;">⏳ Order Placed</h2>
                             <p class="text-muted mb-0">Your order has been received and is waiting in the queue.</p>
-                        @elseif($order->status === 'preparing')
-                            <h2 class="fw-bold mb-2 text-info">🍳 Preparing</h2>
-                            <p class="text-muted mb-0">Our kitchen is preparing your delicious order right now.</p>
+                        @elseif($order->status === 'confirmed')
+                            <h2 class="fw-bold mb-2 text-primary">👍 Order Confirmed</h2>
+                            <p class="text-muted mb-0">Your order has been confirmed by our team and is scheduled for brewing.</p>
+                        @elseif(in_array($order->status, ['brewing', 'preparing', 'processed']))
+                            <h2 class="fw-bold mb-2" style="color: #e58e26;">☕ Brewing Drink</h2>
+                            <p class="text-muted mb-0">Our professional baristas are brewing your coffee with love right now.</p>
                         @elseif($order->status === 'ready')
-                            <h2 class="fw-bold mb-2 text-primary">🔔 Ready for Pickup</h2>
+                            <h2 class="fw-bold mb-2 text-success">🔔 Ready for Pickup</h2>
                             @if(($order->order_type ?? 'takeaway') === 'dine_in')
-                                <p class="text-success fw-bold mb-0">Table {{ $order->table->table_number ?? 'N/A' }} order is ready!</p>
+                                <p class="text-success fw-bold mb-0">Table {{ $order->table->table_number ?? 'N/A' }} order is ready! Enjoy.</p>
                             @else
-                                <p class="text-success fw-bold mb-0">Please collect your warm order at the counter.</p>
+                                <p class="text-success fw-bold mb-0">Please collect your warm drink at the counter.</p>
                             @endif
+                        @elseif($order->status === 'on_delivery')
+                            <h2 class="fw-bold mb-2 text-info">🚚 Out for Delivery</h2>
+                            <p class="text-muted mb-0">Your warm order has been handed to our courier and is heading your way!</p>
                         @elseif($order->status === 'completed')
                             <h2 class="fw-bold mb-2 text-success">✅ Completed</h2>
                             <p class="text-muted mb-0">Enjoy your meal! Thank you for ordering from Coffee Street ☕</p>
+                        @elseif($order->status === 'cancelled')
+                            <h2 class="fw-bold mb-2 text-danger">❌ Cancelled</h2>
+                            <p class="text-muted mb-0">This order has been cancelled. Please contact the cashier for details.</p>
                         @else
                             <h2 class="fw-bold mb-2 text-secondary">{{ ucfirst($order->status) }}</h2>
                             <p class="text-muted mb-0">Your order is being processed.</p>
@@ -207,72 +216,78 @@
 
                     <!-- Progress Stepper Stepped Nodes -->
                     @php
-                        $statuses = ['pending', 'preparing', 'ready', 'completed'];
-                        $currentIdx = array_search($order->status, $statuses);
+                        $isDelivery = ($order->order_type ?? 'takeaway') === 'delivery';
                         
-                        // Handle legacy "processed" status falling into preparing index fallback
-                        if ($currentIdx === false) {
-                            $currentIdx = ($order->status === 'processed') ? 1 : 0;
+                        if ($isDelivery) {
+                            $steps = [
+                                ['status' => 'pending', 'label' => 'Placed', 'icon' => 'fa-clipboard-list', 'desc' => 'Order placed'],
+                                ['status' => 'confirmed', 'label' => 'Confirmed', 'icon' => 'fa-thumbs-up', 'desc' => 'Confirmed'],
+                                ['status' => 'brewing', 'label' => 'Brewing', 'icon' => 'fa-mug-hot', 'desc' => 'Brewing', 'aliases' => ['preparing', 'processed']],
+                                ['status' => 'ready', 'label' => 'Ready', 'icon' => 'fa-bell', 'desc' => 'Ready'],
+                                ['status' => 'on_delivery', 'label' => 'Shipping', 'icon' => 'fa-truck', 'desc' => 'On Delivery'],
+                                ['status' => 'completed', 'label' => 'Completed', 'icon' => 'fa-circle-check', 'desc' => 'Enjoy!'],
+                            ];
+                        } else {
+                            $steps = [
+                                ['status' => 'pending', 'label' => 'Placed', 'icon' => 'fa-clipboard-list', 'desc' => 'Order placed'],
+                                ['status' => 'confirmed', 'label' => 'Confirmed', 'icon' => 'fa-thumbs-up', 'desc' => 'Confirmed'],
+                                ['status' => 'brewing', 'label' => 'Brewing', 'icon' => 'fa-mug-hot', 'desc' => 'Brewing', 'aliases' => ['preparing', 'processed']],
+                                ['status' => 'ready', 'label' => 'Ready', 'icon' => 'fa-bell', 'desc' => 'Ready'],
+                                ['status' => 'completed', 'label' => 'Completed', 'icon' => 'fa-circle-check', 'desc' => 'Enjoy!'],
+                            ];
                         }
-                        
+
+                        $currentIdx = 0;
+                        foreach ($steps as $idx => $step) {
+                            if ($order->status === $step['status'] || (isset($step['aliases']) && in_array($order->status, $step['aliases']))) {
+                                $currentIdx = $idx;
+                                break;
+                            }
+                        }
+
+                        // Explicit check for completed to ensure it highlights all steps
+                        if ($order->status === 'completed') {
+                            $currentIdx = count($steps) - 1;
+                        }
+
                         // Calculate percentage of filling progress line
-                        $progressPercent = ($currentIdx / (count($statuses) - 1)) * 100;
+                        $progressPercent = $order->status === 'cancelled' ? 0 : (($currentIdx / (count($steps) - 1)) * 100);
                     @endphp
 
-                    <div class="position-relative mb-5 px-3">
-                        <ul class="progress-stepper">
-                            <!-- Connector Progress Line Fill -->
-                            <div class="progress-line-fill" style="width: {{ $progressPercent }}%;"></div>
+                    @if($order->status === 'cancelled')
+                        <div class="alert alert-danger rounded-4 border-0 shadow-sm text-center mb-4 py-3">
+                            <i class="fa fa-circle-exclamation me-2"></i> This order was cancelled and cannot be tracked further.
+                        </div>
+                    @else
+                        <div class="position-relative mb-5 px-1 px-md-3">
+                            <ul class="progress-stepper mb-0">
+                                <!-- Connector Progress Line Fill -->
+                                <div class="progress-line-fill" style="width: {{ $progressPercent }}%;"></div>
 
-                            <!-- Step 1: Pending -->
-                            <li class="step-item {{ $currentIdx > 0 ? 'finished' : ($currentIdx == 0 ? 'active' : '') }}">
-                                <div class="step-icon">
-                                    @if($currentIdx > 0)
-                                        <i class="fa fa-check"></i>
-                                    @else
-                                        <i class="fa fa-inbox"></i>
-                                    @endif
-                                </div>
-                                <span class="step-label">Pending</span>
-                            </li>
-
-                            <!-- Step 2: Preparing -->
-                            <li class="step-item {{ $currentIdx > 1 ? 'finished' : ($currentIdx == 1 ? 'active' : '') }}">
-                                <div class="step-icon">
-                                    @if($currentIdx > 1)
-                                        <i class="fa fa-check"></i>
-                                    @else
-                                        <i class="fa fa-mug-hot"></i>
-                                    @endif
-                                </div>
-                                <span class="step-label">Preparing</span>
-                            </li>
-
-                            <!-- Step 3: Ready -->
-                            <li class="step-item {{ $currentIdx > 2 ? 'finished' : ($currentIdx == 2 ? 'active' : '') }}">
-                                <div class="step-icon">
-                                    @if($currentIdx > 2)
-                                        <i class="fa fa-check"></i>
-                                    @else
-                                        <i class="fa fa-bell"></i>
-                                    @endif
-                                </div>
-                                <span class="step-label">Ready</span>
-                            </li>
-
-                            <!-- Step 4: Completed -->
-                            <li class="step-item {{ $currentIdx == 3 ? 'finished' : '' }}">
-                                <div class="step-icon">
-                                    <i class="fa fa-circle-check"></i>
-                                </div>
-                                <span class="step-label">Completed</span>
-                            </li>
-                        </ul>
-                    </div>
+                                @foreach($steps as $idx => $step)
+                                    @php
+                                        $isFinished = $idx < $currentIdx;
+                                        $isActive = $idx === $currentIdx;
+                                    @endphp
+                                    <li class="step-item {{ $isFinished ? 'finished' : ($isActive ? 'active' : '') }}">
+                                        <div class="step-icon">
+                                            @if($isFinished)
+                                                <i class="fa fa-check"></i>
+                                            @else
+                                                <i class="fa {{ $step['icon'] }}"></i>
+                                            @endif
+                                        </div>
+                                        <span class="step-label d-block text-truncate">{{ $step['label'] }}</span>
+                                        <span class="text-muted d-none d-md-block" style="font-size: 0.7rem; margin-top: 2px;">{{ $step['desc'] }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     <!-- Live Indicator (only shown when order is active) -->
-                    @if($order->status !== 'completed')
-                        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    @if(!in_array($order->status, ['completed', 'cancelled']))
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-2 mt-4">
                             <span class="spinner-grow spinner-grow-sm text-warning" role="status"></span>
                             <span class="text-muted small">Auto-checking order status in real-time...</span>
                         </div>

@@ -567,9 +567,13 @@
                                     @php
                                         $badges = [
                                             'pending' => 'bg-warning text-dark',
+                                            'confirmed' => 'bg-primary text-white',
                                             'preparing' => 'bg-info text-white',
-                                            'ready' => 'bg-primary text-white',
-                                            'completed' => 'bg-success',
+                                            'brewing' => 'bg-info text-white',
+                                            'ready' => 'bg-success text-white',
+                                            'on_delivery' => 'bg-info text-white',
+                                            'completed' => 'bg-success text-white',
+                                            'cancelled' => 'bg-danger text-white',
                                             'processed' => 'bg-secondary text-white',
                                         ];
                                     @endphp

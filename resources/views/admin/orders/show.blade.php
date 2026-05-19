@@ -205,6 +205,70 @@
                     <h5 class="mb-0">Order Status</h5>
                 </div>
                 <div class="card-body">
+                    <!-- Quick Progression Flow (Additive) -->
+                    @php
+                        $nextStatus = null;
+                        $btnText = '';
+                        $btnClass = '';
+                        $currentStatus = $order->status;
+                        
+                        if ($currentStatus === 'pending') {
+                            $nextStatus = 'confirmed';
+                            $btnText = '👍 Confirm Order';
+                            $btnClass = 'btn-primary';
+                        } elseif ($currentStatus === 'confirmed') {
+                            $nextStatus = 'brewing';
+                            $btnText = '☕ Start Brewing';
+                            $btnClass = 'btn-info text-white';
+                        } elseif ($currentStatus === 'brewing' || $currentStatus === 'preparing' || $currentStatus === 'processed') {
+                            $nextStatus = 'ready';
+                            $btnText = '🔔 Mark Ready for Pickup';
+                            $btnClass = 'btn-warning text-dark';
+                        } elseif ($currentStatus === 'ready') {
+                            if (($order->order_type ?? 'takeaway') === 'delivery') {
+                                $nextStatus = 'on_delivery';
+                                $btnText = '🚚 Out for Delivery';
+                                $btnClass = 'btn-info text-white';
+                            } else {
+                                $nextStatus = 'completed';
+                                $btnText = '✅ Complete Order';
+                                $btnClass = 'btn-success';
+                            }
+                        } elseif ($currentStatus === 'on_delivery') {
+                            $nextStatus = 'completed';
+                            $btnText = '✅ Complete Order';
+                            $btnClass = 'btn-success';
+                        }
+                    @endphp
+
+                    @if($nextStatus)
+                        <div class="mb-3 text-center">
+                            <span class="text-muted small d-block mb-2">Recommended Action</span>
+                            <form action="{{ route('admin.orders.status', $order) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="status" value="{{ $nextStatus }}">
+                                <button type="submit" class="btn w-100 rounded-5 fw-bold {{ $btnClass }} shadow-sm py-2">
+                                    {{ $btnText }}
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+
+                    @if(!in_array($currentStatus, ['completed', 'cancelled']))
+                        <div class="mb-3 text-center">
+                            <form action="{{ route('admin.orders.status', $order) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="status" value="cancelled">
+                                <button type="submit" class="btn btn-outline-danger w-100 rounded-5 fw-bold btn-sm py-1.5">
+                                    ❌ Cancel Order
+                                </button>
+                            </form>
+                        </div>
+                        <hr class="my-3 text-muted" style="opacity: 0.15;">
+                    @endif
+
                     <form action="{{ route('admin.orders.status', $order) }}" method="POST">
                         @csrf
                         @method('PATCH')
@@ -213,15 +277,19 @@
                             <label for="status" class="form-label">Current Status</label>
                             <select name="status" id="status" class="form-select">
                                 <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                                 <option value="preparing" {{ $order->status == 'preparing' ? 'selected' : '' }}>Preparing</option>
+                                <option value="brewing" {{ $order->status == 'brewing' ? 'selected' : '' }}>Brewing</option>
                                 <option value="ready" {{ $order->status == 'ready' ? 'selected' : '' }}>Ready for Pickup</option>
+                                <option value="on_delivery" {{ $order->status == 'on_delivery' ? 'selected' : '' }}>On Delivery</option>
                                 <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Completed</option>
+                                <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                                 <option value="processed" {{ $order->status == 'processed' ? 'selected' : '' }}>Processed</option>
                             </select>
                         </div>
                         
                         <button type="submit" class="btn w-100 text-white rounded-5" style="background-color: #FF902A;">
-                            Update Status
+                            Update Status Manually
                         </button>
                     </form>
                 </div>

@@ -400,6 +400,145 @@
         </div>
     </div>
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
+    
+    {{-- Row 5 — Business Intelligence (Top Sellers & Insights) --}}
+    @php
+        // Top 4 Selling Products (from paid orders)
+        $topProducts = \App\Models\OrderItem::selectRaw('product_id, SUM(quantity) as total_qty')
+            ->whereHas('order', function($q) {
+                $q->where('payment_status', 'paid');
+            })
+            ->with('product')
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->take(4)
+            ->get();
+
+        // Advanced Payment Insights: Cash vs QRIS Revenue
+        $cashRevenue = \App\Models\Order::where('payment_method', 'cash')->where('payment_status', 'paid')->sum('total_price') * 1000;
+        $qrisRevenue = \App\Models\Order::where('payment_method', 'online')->where('payment_status', 'paid')->sum('total_price') * 1000;
+        $totalRev = $cashRevenue + $qrisRevenue;
+        $cashPct = $totalRev > 0 ? round(($cashRevenue / $totalRev) * 100) : 0;
+        $qrisPct = $totalRev > 0 ? round(($qrisRevenue / $totalRev) * 100) : 0;
+
+        // BI Stats
+        $totalItemsSold = \App\Models\OrderItem::whereHas('order', function($q){
+            $q->where('payment_status', 'paid');
+        })->sum('quantity');
+        $avgItemsPerOrder = $paidOrders > 0 ? round($totalItemsSold / $paidOrders, 1) : 0;
+        
+        $returningCustomers = \App\Models\Order::select('phone')
+            ->whereNotNull('phone')
+            ->where('phone', '!=', '')
+            ->groupBy('phone')
+            ->havingRaw('COUNT(id) > 1')
+            ->get()
+            ->count();
+    @endphp
+
+    <div class="row g-3 mb-4">
+        {{-- Top Selling Products --}}
+        <div class="col-md-5">
+            <div class="breakdown-card h-100">
+                <div class="breakdown-title"><i class="fa fa-crown me-1" style="color:#FF902A;"></i> Top Selling Products</div>
+                @forelse($topProducts as $item)
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            <div style="width: 40px; height: 40px; background-color: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                @if($item->product && $item->product->image)
+                                    <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" style="width:100%; height:100%; object-fit:cover;">
+                                @else
+                                    <i class="fa fa-coffee text-muted"></i>
+                                @endif
+                            </div>
+                        </div>
+                        <div style="flex:1;">
+                            <div class="breakdown-label" style="font-weight: 600; font-size: 0.9rem;">{{ $item->product ? $item->product->name : 'Unknown Product' }}</div>
+                            <div class="kpi-sub mt-0" style="font-size: 0.75rem;">{{ $item->product ? $item->product->category->name ?? 'Uncategorized' : 'N/A' }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="breakdown-val fs-6">{{ $item->total_qty }}</div>
+                            <div class="kpi-sub mt-0">sold</div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-4 text-muted" style="font-size: 0.85rem;">
+                        <i class="fa fa-box-open mb-2" style="font-size: 1.5rem; color: #dee2e6;"></i><br>
+                        No sales data yet
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Advanced Payment Insights --}}
+        <div class="col-md-4">
+            <div class="breakdown-card h-100 d-flex flex-column">
+                <div class="breakdown-title"><i class="fa fa-wallet me-1" style="color:#FF902A;"></i> Revenue by Method</div>
+                
+                <div class="mt-2 mb-auto">
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <div>
+                            <div class="kpi-sub mt-0 text-uppercase fw-bold"><i class="fa fa-qrcode text-primary me-1"></i> QRIS / Online</div>
+                            <div class="breakdown-val fs-5 mt-1">Rp {{ number_format($qrisRevenue, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-primary rounded-pill px-3">{{ $qrisPct }}%</span>
+                        </div>
+                    </div>
+                    <div class="breakdown-bar-wrap mb-4" style="height: 6px;">
+                        <div class="breakdown-bar" style="width:{{ $qrisPct }}%; background:#0d6efd;"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <div>
+                            <div class="kpi-sub mt-0 text-uppercase fw-bold"><i class="fa fa-money-bill-wave text-success me-1"></i> Cash</div>
+                            <div class="breakdown-val fs-5 mt-1">Rp {{ number_format($cashRevenue, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success rounded-pill px-3">{{ $cashPct }}%</span>
+                        </div>
+                    </div>
+                    <div class="breakdown-bar-wrap" style="height: 6px;">
+                        <div class="breakdown-bar" style="width:{{ $cashPct }}%; background:#198754;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Business Intelligence Mini Widgets --}}
+        <div class="col-md-3">
+            <div class="d-flex flex-column gap-3 h-100">
+                <div class="breakdown-card flex-fill d-flex flex-column justify-content-center" style="padding: 15px 20px;">
+                    <div class="d-flex align-items-center">
+                        <div class="kpi-icon kpi-icon-purple me-3" style="width: 42px; height: 42px;"><i class="fa fa-shopping-basket" style="font-size: 1.1rem;"></i></div>
+                        <div>
+                            <div class="kpi-label mb-1" style="font-size: 0.65rem;">Avg Items / Order</div>
+                            <div class="breakdown-val fs-5">{{ $avgItemsPerOrder }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="breakdown-card flex-fill d-flex flex-column justify-content-center" style="padding: 15px 20px;">
+                    <div class="d-flex align-items-center">
+                        <div class="kpi-icon kpi-icon-teal me-3" style="width: 42px; height: 42px;"><i class="fa fa-users" style="font-size: 1.1rem;"></i></div>
+                        <div>
+                            <div class="kpi-label mb-1" style="font-size: 0.65rem;">Returning Customers</div>
+                            <div class="breakdown-val fs-5">{{ number_format($returningCustomers) }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="breakdown-card flex-fill d-flex flex-column justify-content-center" style="padding: 15px 20px;">
+                    <div class="d-flex align-items-center">
+                        <div class="kpi-icon kpi-icon-orange me-3" style="width: 42px; height: 42px;"><i class="fa fa-box" style="font-size: 1.1rem;"></i></div>
+                        <div>
+                            <div class="kpi-label mb-1" style="font-size: 0.65rem;">Total Items Sold</div>
+                            <div class="breakdown-val fs-5">{{ number_format($totalItemsSold) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- ═══════════════════════════════════════════════════════════════════ --}}
 
     <div class="card shadow-sm border-0">
         <div class="card-body">

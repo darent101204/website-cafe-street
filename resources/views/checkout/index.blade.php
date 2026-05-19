@@ -145,16 +145,16 @@
                                         <tr>
                                             <td>
                                                 <strong>{{ $item['name'] }}</strong><br>
-                                                <small class="text-muted">{{ number_format($item['price'], 0) }} K x {{ $item['quantity'] }}</small>
+                                                <small class="text-muted">Rp {{ number_format($item['price'] * 1000, 0, ',', '.') }} x {{ $item['quantity'] }}</small>
                                             </td>
                                             <td class="text-end">
-                                                {{ number_format($item['price'] * $item['quantity'], 0) }} K
+                                                Rp {{ number_format($item['price'] * $item['quantity'] * 1000, 0, ',', '.') }}
                                             </td>
                                         </tr>
                                     @endforeach
                                     <tr class="border-top">
                                         <td><strong>Subtotal</strong></td>
-                                        <td class="text-end"><strong>{{ number_format($total, 0) }} K</strong></td>
+                                        <td class="text-end"><strong>Rp {{ number_format($total * 1000, 0, ',', '.') }}</strong></td>
                                     </tr>
                                     <tr>
                                         <td>Delivery</td>
@@ -162,7 +162,7 @@
                                     </tr>
                                     <tr class="border-top">
                                         <td><h4><strong>Total</strong></h4></td>
-                                        <td class="text-end"><h4 style="color: #FF902A;"><strong>{{ number_format($total, 0) }} K</strong></h4></td>
+                                        <td class="text-end"><h4 style="color: #FF902A;"><strong>Rp {{ number_format($total * 1000, 0, ',', '.') }}</strong></h4></td>
                                     </tr>
                                 </tbody>
                             </table>

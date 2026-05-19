@@ -132,7 +132,7 @@ class OrderController extends Controller
                 $params = [
                     'transaction_details' => [
                         'order_id' => $midtransOrderId,
-                        'gross_amount' => (int) $total,
+                        'gross_amount' => (int) ($total * 1000),
                     ],
                     'customer_details' => [
                         'first_name' => $request->name,
@@ -302,5 +302,48 @@ class OrderController extends Controller
         }
 
         return view('checkout.track', compact('order'));
+    }
+
+    /**
+     * Show basic receipt
+     */
+    public function receipt($tracking_token)
+    {
+        if (empty($tracking_token)) {
+            abort(404);
+        }
+
+        $order = Order::with(['items.product', 'table'])
+            ->where('tracking_token', $tracking_token)
+            ->first();
+
+        if (!$order) {
+            abort(404);
+        }
+
+        return view('checkout.receipt', compact('order'));
+    }
+
+    /**
+     * Download invoice as PDF
+     */
+    public function invoice($tracking_token)
+    {
+        if (empty($tracking_token)) {
+            abort(404);
+        }
+
+        $order = Order::with(['items.product', 'table'])
+            ->where('tracking_token', $tracking_token)
+            ->first();
+
+        if (!$order) {
+            abort(404);
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('checkout.invoice', compact('order'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('invoice-order-' . $order->id . '.pdf');
     }
 }

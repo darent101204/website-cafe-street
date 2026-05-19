@@ -157,7 +157,7 @@
                         @endif
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="fw-bold" style="color: #FF902A;">{{ number_format($order->total_price, 0) }} K</span>
+                            <span class="fw-bold" style="color: #FF902A;">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</span>
                             <form action="{{ route('admin.kitchen.status', $order) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('PATCH')
@@ -220,7 +220,7 @@
                         @endif
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="fw-bold" style="color: #FF902A;">{{ number_format($order->total_price, 0) }} K</span>
+                            <span class="fw-bold" style="color: #FF902A;">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</span>
                             <form action="{{ route('admin.kitchen.status', $order) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('PATCH')
@@ -283,7 +283,7 @@
                         @endif
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="fw-bold" style="color: #FF902A;">{{ number_format($order->total_price, 0) }} K</span>
+                            <span class="fw-bold" style="color: #FF902A;">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</span>
                             <form action="{{ route('admin.kitchen.status', $order) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('PATCH')
@@ -340,7 +340,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="fw-bold text-muted">{{ number_format($order->total_price, 0) }} K</span>
+                            <span class="fw-bold text-muted">Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</span>
                             <span class="badge bg-success py-1 px-2.5 rounded-pill" style="font-size: 0.7rem;">Done</span>
                         </div>
                     </div>

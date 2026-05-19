@@ -10,6 +10,11 @@
             <p class="text-muted">{{ $order->created_at->format('l, d F Y H:i') }}</p>
         </div>
         <div class="col-md-6 text-end">
+            @if(!empty($order->tracking_token))
+                <a href="{{ route('order.receipt', $order->tracking_token) }}" target="_blank" class="btn btn-outline-success rounded-5 me-2">
+                    🧾 Open Receipt
+                </a>
+            @endif
             <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary rounded-5">
                 <i class="fa fa-arrow-left"></i> Back to Orders
             </a>
@@ -58,16 +63,16 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center">{{ number_format($item->price, 0) }} K</td>
+                                        <td class="text-center">Rp {{ number_format($item->price * 1000, 0, ',', '.') }}</td>
                                         <td class="text-center">{{ $item->quantity }}</td>
-                                        <td class="text-end fw-bold">{{ number_format($item->price * $item->quantity, 0) }} K</td>
+                                        <td class="text-end fw-bold">Rp {{ number_format($item->price * $item->quantity * 1000, 0, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                             <tfoot class="bg-light">
                                 <tr>
                                     <td colspan="3" class="text-end"><strong>Total Amount</strong></td>
-                                    <td class="text-end"><h4 style="color: #FF902A;"><strong>{{ number_format($order->total_price, 0) }} K</strong></h4></td>
+                                    <td class="text-end"><h4 style="color: #FF902A;"><strong>Rp {{ number_format($order->total_price * 1000, 0, ',', '.') }}</strong></h4></td>
                                 </tr>
                             </tfoot>
                         </table>

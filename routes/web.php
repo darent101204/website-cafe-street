@@ -56,6 +56,8 @@ Route::get('/checkout/success', [App\Http\Controllers\OrderController::class, 's
 Route::get('/checkout/payment/{tracking_token}', [App\Http\Controllers\OrderController::class, 'payment'])->name('checkout.payment');
 Route::post('/midtrans/callback', [App\Http\Controllers\OrderController::class, 'callback'])->name('midtrans.callback');
 Route::get('/order/track/{tracking_token}', [App\Http\Controllers\OrderController::class, 'track'])->name('order.track');
+Route::get('/receipt/{tracking_token}', [App\Http\Controllers\OrderController::class, 'receipt'])->name('order.receipt');
+Route::get('/invoice/{tracking_token}', [App\Http\Controllers\OrderController::class, 'invoice'])->name('order.invoice');
 
 // Admin routes (Middleware will be added to this group later)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {

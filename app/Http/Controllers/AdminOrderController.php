@@ -13,7 +13,29 @@ class AdminOrderController extends Controller
     public function index()
     {
         $orders = Order::latest()->paginate(10);
-        return view('admin.orders.index', compact('orders'));
+
+        // ── Analytics KPIs (read-only, additive) ──────────────────────────
+        $totalOrders      = Order::count();
+        $totalRevenue     = Order::where('payment_status', 'paid')->sum('total_price') * 1000;
+        $todayOrders      = Order::whereDate('created_at', today())->count();
+        $todayRevenue     = Order::whereDate('created_at', today())->where('payment_status', 'paid')->sum('total_price') * 1000;
+        $pendingOrders    = Order::where('status', 'pending')->count();
+        $completedOrders  = Order::where('status', 'completed')->count();
+        $paidOrders       = Order::where('payment_status', 'paid')->count();
+        $unpaidOrders     = Order::whereIn('payment_status', ['unpaid', 'pending_cash'])->count();
+        $qrisOrders       = Order::where('payment_method', 'online')->count();
+        $cashOrders       = Order::where('payment_method', 'cash')->count();
+        $dineInOrders     = Order::where('order_type', 'dine_in')->count();
+        $takeawayOrders   = Order::where('order_type', 'takeaway')->count();
+        $deliveryOrders   = Order::where('order_type', 'delivery')->count();
+        // ──────────────────────────────────────────────────────────────────
+
+        return view('admin.orders.index', compact(
+            'orders',
+            'totalOrders', 'totalRevenue', 'todayOrders', 'todayRevenue',
+            'pendingOrders', 'completedOrders', 'paidOrders', 'unpaidOrders',
+            'qrisOrders', 'cashOrders', 'dineInOrders', 'takeawayOrders', 'deliveryOrders'
+        ));
     }
 
     /**

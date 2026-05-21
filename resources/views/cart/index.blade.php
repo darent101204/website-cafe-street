@@ -25,13 +25,7 @@
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-md-2">
-                                    @if(file_exists(public_path('images/' . $details['image'])))
-                                        <img src="{{ asset('images/' . $details['image']) }}" class="img-fluid rounded" alt="{{ $details['name'] }}">
-                                    @elseif(file_exists(public_path('images/products/' . $details['image'])))
-                                        <img src="{{ asset('images/products/' . $details['image']) }}" class="img-fluid rounded" alt="{{ $details['name'] }}">
-                                    @else
-                                        <img src="{{ asset('images/img_product.png') }}" class="img-fluid rounded" alt="{{ $details['name'] }}">
-                                    @endif
+                                    <img src="{{ !empty($details['image']) ? (str_starts_with($details['image'], 'images/') ? asset($details['image']) : Storage::url($details['image'])) : asset('images/no-image.png') }}" class="img-fluid rounded" alt="{{ $details['name'] }}">
                                 </div>
                                 <div class="col-md-4">
                                     <h5><b>{{ $details['name'] }}</b></h5>

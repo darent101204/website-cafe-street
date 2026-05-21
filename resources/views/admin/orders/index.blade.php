@@ -445,13 +445,7 @@
                     <div class="d-flex align-items-center mb-3">
                         <div class="me-3">
                             <div style="width: 40px; height: 40px; background-color: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                                @if($item->product && file_exists(public_path('images/' . $item->product->image)))
-                                    <img src="{{ asset('images/' . $item->product->image) }}" alt="{{ $item->product->name }}" style="width:100%; height:100%; object-fit:cover;">
-                                @elseif($item->product && file_exists(public_path('images/products/' . $item->product->image)))
-                                    <img src="{{ asset('images/products/' . $item->product->image) }}" alt="{{ $item->product->name }}" style="width:100%; height:100%; object-fit:cover;">
-                                @else
-                                    <img src="{{ asset('images/img_product.png') }}" alt="{{ $item->product ? $item->product->name : 'Product' }}" style="width:100%; height:100%; object-fit:cover;">
-                                @endif
+                                <img src="{{ $item->product && $item->product->image ? (str_starts_with($item->product->image, 'images/') ? asset($item->product->image) : Storage::url($item->product->image)) : asset('images/no-image.png') }}" alt="{{ $item->product ? $item->product->name : 'Product' }}" style="width:100%; height:100%; object-fit:cover;">
                             </div>
                         </div>
                         <div style="flex:1;">

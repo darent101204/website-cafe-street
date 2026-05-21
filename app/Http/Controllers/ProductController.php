@@ -42,10 +42,8 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/products'), $imageName);
-            $validated['image'] = $imageName;
+            $imagePath = $request->file('image')->store('products', 'public');
+            $validated['image'] = $imagePath;
         }
 
         Product::create($validated);
@@ -87,15 +85,15 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
-                unlink(public_path('images/products/' . $product->image));
+            // Delete old image if it is a new storage upload
+            if ($product->image && str_starts_with($product->image, 'products/')) {
+                if (Storage::disk('public')->exists($product->image)) {
+                    Storage::disk('public')->delete($product->image);
+                }
             }
 
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/products'), $imageName);
-            $validated['image'] = $imageName;
+            $imagePath = $request->file('image')->store('products', 'public');
+            $validated['image'] = $imagePath;
         }
 
         $product->update($validated);
@@ -109,9 +107,11 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        // Delete image file
-        if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
-            unlink(public_path('images/products/' . $product->image));
+        // Delete image file from storage if it is a new upload
+        if ($product->image && str_starts_with($product->image, 'products/')) {
+            if (Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
         }
 
         $product->delete();

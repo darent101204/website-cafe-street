@@ -18,13 +18,7 @@
                     <div class="card text-center border-light shadow-lg">
                         <div class="card-body">
                             <div class="image-wrapper position-relative">
-                                @if(file_exists(public_path('images/' . $product->image)))
-                                    <img src="{{ asset('images/' . $product->image) }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
-                                @elseif(file_exists(public_path('images/products/' . $product->image)))
-                                    <img src="{{ asset('images/products/' . $product->image) }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
-                                @else
-                                    <img src="{{ asset('images/img_product.png') }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
-                                @endif
+                                <img src="{{ $product->image ? (str_starts_with($product->image, 'images/') ? asset($product->image) : Storage::url($product->image)) : asset('images/no-image.png') }}" class="rounded-3 img-fluid" alt="{{ $product->name }}">
                                 <button class="btn-rating position-absolute rounded-5 border border-4"
                                     style="background-color: white; border-color: #7E7D7A;">
                                     <b>{{ number_format($product->rating, 1) }}</b> 

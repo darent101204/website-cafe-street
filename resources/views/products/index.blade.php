@@ -43,13 +43,7 @@
                                     </button>
                                 </form>
                             @endauth
-                            @if(file_exists(public_path('images/' . $product->image)))
-                                <img src="{{ asset('images/' . $product->image) }}" class="rounded-3 img-fluid w-100" style="height: 200px; object-fit: cover;" alt="{{ $product->name }}">
-                            @elseif(file_exists(public_path('images/products/' . $product->image)))
-                                <img src="{{ asset('images/products/' . $product->image) }}" class="rounded-3 img-fluid w-100" style="height: 200px; object-fit: cover;" alt="{{ $product->name }}">
-                            @else
-                                <img src="{{ asset('images/img_product.png') }}" class="rounded-3 img-fluid w-100" style="height: 200px; object-fit: cover;" alt="{{ $product->name }}">
-                            @endif
+                            <img src="{{ $product->image ? (str_starts_with($product->image, 'images/') ? asset($product->image) : Storage::url($product->image)) : asset('images/no-image.png') }}" class="rounded-3 img-fluid w-100" style="height: 200px; object-fit: cover;" alt="{{ $product->name }}">
                             <div class="position-absolute top-0 end-0 p-2">
                                 <span class="badge rounded-pill bg-white text-dark shadow-sm border">
                                     <i class="fa fa-star text-warning"></i> {{ number_format($product->rating, 1) }}

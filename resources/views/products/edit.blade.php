@@ -70,11 +70,8 @@
                         <div class="mb-3">
                             <label for="image" class="form-label"><b>Product Image</b></label>
                             <div class="mb-2">
-                                @if(file_exists(public_path('images/' . $product->image)))
-                                    <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" 
-                                        class="img-thumbnail" style="max-width: 200px;">
-                                @elseif(file_exists(public_path('images/products/' . $product->image)))
-                                    <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" 
+                                @if($product->image)
+                                    <img src="{{ str_starts_with($product->image, 'images/') ? asset($product->image) : Storage::url($product->image) }}" alt="{{ $product->name }}" 
                                         class="img-thumbnail" style="max-width: 200px;">
                                 @endif
                             </div>

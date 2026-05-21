@@ -51,13 +51,7 @@
                                     <tr class="border-bottom">
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                @if($item->product && file_exists(public_path('images/' . $item->product->image)))
-                                                    <img src="{{ asset('images/' . $item->product->image) }}" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
-                                                @elseif($item->product && file_exists(public_path('images/products/' . $item->product->image)))
-                                                    <img src="{{ asset('images/products/' . $item->product->image) }}" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
-                                                @else
-                                                    <img src="{{ asset('images/img_product.png') }}" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
-                                                @endif
+                                                <img src="{{ $item->product && $item->product->image ? (str_starts_with($item->product->image, 'images/') ? asset($item->product->image) : Storage::url($item->product->image)) : asset('images/no-image.png') }}" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
                                                 <div>
                                                     <span class="d-block fw-bold">{{ $item->product ? $item->product->name : 'Unknown Product' }}</span>
                                                 </div>

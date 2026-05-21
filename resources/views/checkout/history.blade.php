@@ -36,15 +36,7 @@
                         <div class="card shadow-sm border-0 rounded-4 h-100">
                             <div class="card-body p-3 d-flex flex-column">
                                 <div class="d-flex align-items-center mb-3">
-                                    @if(file_exists(public_path('images/' . $favorite->product->image)))
-                                        <img src="{{ asset('images/' . $favorite->product->image) }}" class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;">
-                                    @elseif(file_exists(public_path('images/products/' . $favorite->product->image)))
-                                        <img src="{{ asset('images/products/' . $favorite->product->image) }}" class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;">
-                                    @else
-                                        <div class="rounded-3 me-3 bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                                            <i class="fa fa-coffee text-muted"></i>
-                                        </div>
-                                    @endif
+                                    <img src="{{ $favorite->product->image ? (str_starts_with($favorite->product->image, 'images/') ? asset($favorite->product->image) : Storage::url($favorite->product->image)) : asset('images/no-image.png') }}" class="rounded-3 me-3" style="width: 60px; height: 60px; object-fit: cover;">
                                     <div style="flex: 1; min-width: 0;">
                                         <h6 class="fw-bold mb-1 text-truncate">{{ $favorite->product->name }}</h6>
                                         <span class="text-muted small">Rp {{ number_format($favorite->product->price, 0, ',', '.') }}</span>
@@ -140,10 +132,8 @@
                                 <div class="d-flex flex-wrap gap-2">
                                     @foreach($order->items as $item)
                                         <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 border">
-                                            @if($item->product && file_exists(public_path('images/' . $item->product->image)))
-                                                <img src="{{ asset('images/' . $item->product->image) }}" class="rounded-circle me-2" style="width: 20px; height: 20px; object-fit: cover;">
-                                            @elseif($item->product && file_exists(public_path('images/products/' . $item->product->image)))
-                                                <img src="{{ asset('images/products/' . $item->product->image) }}" class="rounded-circle me-2" style="width: 20px; height: 20px; object-fit: cover;">
+                                            @if($item->product && $item->product->image)
+                                                <img src="{{ str_starts_with($item->product->image, 'images/') ? asset($item->product->image) : Storage::url($item->product->image) }}" class="rounded-circle me-2" style="width: 20px; height: 20px; object-fit: cover;">
                                             @else
                                                 <i class="fa fa-coffee text-muted me-2" style="font-size: 0.8rem;"></i>
                                             @endif

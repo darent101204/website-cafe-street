@@ -1,27 +1,57 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+@extends('layouts.app')
+
+@section('title', 'Confirm Password - Coffee Street')
+
+@section('content')
+<div class="cs-auth-compact-container">
+    <div class="cs-auth-compact-card">
+        <h2 class="h4 fw-bold mb-2" style="color: var(--cs-brown);">Confirm Password</h2>
+        <p class="text-muted small mb-4">
+            {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+        </p>
+
+        <form method="POST" action="{{ route('password.confirm') }}">
+            @csrf
+
+            <!-- Password -->
+            <div class="cs-form-group mb-4">
+                <label for="password" class="cs-form-label">Password</label>
+                <div class="cs-password-wrapper">
+                    <input id="password" class="cs-input" type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+                    <button type="button" class="cs-password-toggle" onclick="togglePasswordVisibility('password', 'password-toggle-icon')" aria-label="Toggle password visibility">
+                        <i id="password-toggle-icon" class="fa fa-eye"></i>
+                    </button>
+                </div>
+                @error('password')
+                    <div class="cs-validation-error">
+                        <i class="fa fa-circle-exclamation"></i>
+                        <span>{{ $message }}</span>
+                    </div>
+                @enderror
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-lg btn-primary rounded-3 text-white">
+                    {{ __('Confirm') }}
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <form method="POST" action="{{ route('password.confirm') }}">
-        @csrf
-
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+<script>
+    function togglePasswordVisibility(fieldId, iconId) {
+        const passwordField = document.getElementById(fieldId);
+        const icon = document.getElementById(iconId);
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
+@endsection

@@ -39,12 +39,32 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="id" value="{{ $id }}">
-                                        <div class="input-group input-group-sm">
-                                            <input type="number" name="quantity" value="{{ $details['quantity'] }}" 
-                                                min="1" class="form-control text-center" style="max-width: 70px;">
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-refresh"></i>
-                                            </button>
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            {{-- Tombol Minus --}}
+                                            <form action="{{ route('cart.update') }}" method="POST" class="me-2">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="id" value="{{ $id }}">
+                                                <input type="hidden" name="quantity" value="{{ max(1, $details['quantity'] - 1) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-circle">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                            </form>
+
+                                            {{-- Quantity --}}
+                                            <span class="fw-bold mx-2">{{ $details['quantity'] }}</span>
+
+                                            {{-- Tombol Plus --}}
+                                            <form action="{{ route('cart.update') }}" method="POST" class="ms-2">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="id" value="{{ $id }}">
+                                                <input type="hidden" name="quantity" value="{{ $details['quantity'] + 1 }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-circle">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </form>
+
                                         </div>
                                     </form>
                                 </div>

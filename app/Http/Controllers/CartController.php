@@ -55,14 +55,22 @@ class CartController extends Controller
      */
     public function update(Request $request)
     {
-        if ($request->id && $request->quantity) {
-            $cart = session()->get('cart');
-            $cart[$request->id]["quantity"] = $request->quantity;
+        $cart = session()->get('cart', []);
+
+        if (isset($cart[$request->id])) {
+
+            if ($request->quantity < 1) {
+                unset($cart[$request->id]);
+            } else {
+                $cart[$request->id]['quantity'] = $request->quantity;
+            }
+
             session()->put('cart', $cart);
-            
-            return redirect()->back()->with('success', 'Cart updated successfully!');
         }
+
+        return back();
     }
+    
 
     /**
      * Remove product from cart

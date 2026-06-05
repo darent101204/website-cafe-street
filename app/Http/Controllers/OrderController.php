@@ -405,4 +405,31 @@ class OrderController extends Controller
 
         return redirect()->route('cart.index')->with('success', 'Order items successfully added to your cart for reordering!');
     }
+
+    public function financeReport()
+    {
+        $orders = Order::all();
+
+        // Total pendapatan (hanya order selesai)
+        $totalRevenue = Order::where('status', 'completed')->sum('total_price');
+
+        // Laporan per bulan
+        $monthlyReport = Order::where('status', 'completed')
+            ->get()
+            ->groupBy(function ($order) {
+                return $order->created_at->format('Y-m');
+            })
+            ->map(function ($items) {
+                return [
+                    'total_orders' => $items->count(),
+                    'total_revenue' => $items->sum('total_price'),
+                ];
+            });
+
+        return view('admin.reports.finance', compact(
+            'totalRevenue',
+            'monthlyReport',
+            'orders'
+        ));
+    }
 }

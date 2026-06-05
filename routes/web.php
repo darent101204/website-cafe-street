@@ -66,6 +66,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::patch('/orders/{order}/status', [App\Http\Controllers\AdminOrderController::class, 'updateStatus'])->name('orders.status');
     Route::patch('/orders/{order}/payment', [App\Http\Controllers\AdminOrderController::class, 'updatePaymentStatus'])->name('orders.payment');
 
+    Route::get('/reports/finance', [App\Http\Controllers\OrderController::class, 'financeReport'])
+    ->name('admin.finance');
+
     // Kitchen Dashboard routes
     Route::get('/kitchen', [App\Http\Controllers\KitchenController::class, 'index'])->name('kitchen.index');
     Route::patch('/kitchen/{order}/status', [App\Http\Controllers\KitchenController::class, 'updateStatus'])->name('kitchen.status');

@@ -535,7 +535,13 @@
         </div>
     </div>
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Orders</h5>
 
+        <a href="{{ url('/admin/reports/finance') }}" class="btn btn-success rounded-5">
+            📊 Laporan Keuangan
+        </a>
+    </div>
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <div class="table-responsive">

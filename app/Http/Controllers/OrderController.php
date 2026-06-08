@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -406,30 +407,99 @@ class OrderController extends Controller
         return redirect()->route('cart.index')->with('success', 'Order items successfully added to your cart for reordering!');
     }
 
-    public function financeReport()
+    public function financeReport(Request $request)
     {
-        $orders = Order::all();
+        $year = $request->year ?? date('Y');
+        $month = $request->month;
 
-        // Total pendapatan (hanya order selesai)
-        $totalRevenue = Order::where('status', 'completed')->sum('total_price');
+        $query = Order::where('status', 'completed')
+            ->whereYear('created_at', $year);
 
-        // Laporan per bulan
-        $monthlyReport = Order::where('status', 'completed')
-            ->get()
-            ->groupBy(function ($order) {
-                return $order->created_at->format('Y-m');
-            })
-            ->map(function ($items) {
-                return [
-                    'total_orders' => $items->count(),
-                    'total_revenue' => $items->sum('total_price'),
-                ];
-            });
+        if (!empty($month)) {
+            $query->whereMonth('created_at', $month);
+        }
 
-        return view('admin.reports.finance', compact(
-            'totalRevenue',
-            'monthlyReport',
-            'orders'
-        ));
+        $orders = $query->orderBy('created_at', 'desc')->get();
+
+        $totalRevenue = $orders->sum('total_price');
+        $totalOrders = $orders->count();
+        $avgOrder = $totalOrders > 0
+            ? $totalRevenue / $totalOrders
+            : 0;
+
+        return view(
+            'admin.reports.finance',
+            compact(
+                'orders',
+                'year',
+                'month',
+                'totalRevenue',
+                'totalOrders',
+                'avgOrder'
+            )
+        );
+    }
+
+    public function financePdf(Request $request)
+    {
+        $year = $request->year ?? date('Y');
+        $month = $request->month;
+
+        $query = Order::where('status', 'completed')
+            ->whereYear('created_at', $year);
+
+        if ($month) {
+            $query->whereMonth('created_at', $month);
+        }
+
+        $orders = $query->get();
+
+        $totalRevenue = $orders->sum('total_price');
+        $totalOrders = $orders->count();
+        $avgOrder = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
+
+        $cashRevenue = $orders
+            ->where('payment_method', 'cash')
+            ->sum('total_price');
+
+        $onlineRevenue = $orders
+            ->where('payment_method', 'online')
+            ->sum('total_price');
+
+        $dineIn = $orders
+            ->where('order_type', 'dine_in')
+            ->count();
+
+        $takeaway = $orders
+            ->where('order_type', 'takeaway')
+            ->count();
+
+        $delivery = $orders
+            ->where('order_type', 'delivery')
+            ->count();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'admin.reports.financePDF',
+            compact(
+                'orders',
+                'year',
+                'month',
+                'totalRevenue',
+                'totalOrders',
+                'avgOrder',
+                'cashRevenue',
+                'onlineRevenue',
+                'dineIn',
+                'takeaway',
+                'delivery'
+            )
+        );
+
+        return $pdf->download(
+            'financial-report-' .
+            $year .
+            ($month ? '-' . $month : '') .
+            '.pdf'
+        );
     }
 }

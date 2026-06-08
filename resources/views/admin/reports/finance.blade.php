@@ -1,176 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Financial Report — Coffee Street</title>
+@extends('layouts.app')
 
-<style>
-* { margin:0; padding:0; box-sizing:border-box; }
+@section('content')
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 11px;
-    color:#1a1a1a;
-    background:#fff;
-}
+<div class="container-fluid">
 
-.page {
-    padding: 40px;
-}
+    <div class="d-flex justify-content-between align-items-center mb-4"> <br>
+    <br>  
+        <h2>📊 Financial Report</h2>
+        <a href="{{ route('admin.admin.financePDF', [
+            'year' => $year,
+            'month' => $month
+        ]) }}" class="btn btn-success rounded-5">
+        <i class="fa fa-file-pdf"></i>    Download PDF
+        </a>
+    </div>
 
-/* HEADER */
-.header {
-    text-align:center;
-    margin-bottom: 25px;
-}
+    {{-- FILTER --}}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
 
-.title {
-    font-size: 26px;
-    font-weight: 900;
-}
+            <form method="GET" action="{{ route('admin.admin.finance') }}">
 
-.subtitle {
-    font-size: 10px;
-    color:#777;
-    margin-top:5px;
-}
+                <div class="row">
 
-/* SUMMARY BOX */
-.summary {
-    width:100%;
-    margin-bottom:20px;
-}
+                    <div class="col-md-4">
+                        <label>Tahun</label>
 
-.box {
-    width: 33%;
-    display:inline-block;
-    padding:12px;
-    background:#f8f8f6;
-    border-left:3px solid #FF902A;
-    margin-right:5px;
-}
+                        <select name="year" class="form-select">
 
-.box h3 {
-    font-size: 14px;
-    margin-bottom:5px;
-}
+                            @for($i = date('Y'); $i >= 2023; $i--)
+                                <option value="{{ $i }}"
+                                    {{ $year == $i ? 'selected' : '' }}>
+                                    {{ $i }}
+                                </option>
+                            @endfor
 
-.box p {
-    font-size: 12px;
-    font-weight: bold;
-}
+                        </select>
+                    </div>
 
-/* TABLE */
-table {
-    width:100%;
-    border-collapse: collapse;
-    margin-top:15px;
-}
+                    <div class="col-md-4">
+                        <label>Bulan</label>
 
-th {
-    background:#2f2f2f;
-    color:#fff;
-    padding:8px;
-    font-size:10px;
-    text-transform: uppercase;
-}
+                        <select name="month" class="form-select">
 
-td {
-    padding:8px;
-    border-bottom:1px solid #eee;
-    font-size:10px;
-}
+                            <option value="">
+                                Semua Bulan
+                            </option>
 
-.right {
-    text-align:right;
-}
+                            @for($m = 1; $m <= 12; $m++)
+                                <option value="{{ $m }}"
+                                    {{ $month == $m ? 'selected' : '' }}>
+                                    {{ DateTime::createFromFormat('!m', $m)->format('F') }}
+                                </option>
+                            @endfor
 
-/* TOTAL */
-.total-box {
-    margin-top:20px;
-    text-align:right;
-    font-size:14px;
-    font-weight:900;
-}
+                        </select>
+                    </div>
 
-.total-box span {
-    color:#FF902A;
-    font-size:16px;
-}
-</style>
-</head>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button class="btn btn-primary w-100">
+                            Filter Laporan
+                        </button>
+                    </div>
 
-<body>
+                </div>
 
-@php
-    $completedOrders = $orders->where('status', 'completed');
-    $totalRevenue = $completedOrders->sum('total_price');
-    $totalOrders = $completedOrders->count();
-    $avgOrder = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
-@endphp
+            </form>
 
-<div class="page">
-
-    <!-- HEADER -->
-    <div class="header">
-        <div class="title">FINANCIAL REPORT</div>
-        <div class="subtitle">
-            Coffee Street — {{ now()->format('d M Y') }}
         </div>
     </div>
 
-    <!-- SUMMARY -->
-    <div class="summary">
-        <div class="box">
-            <h3>Total Revenue</h3>
-            <p>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
+    {{-- SUMMARY --}}
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6>Total Revenue</h6>
+                    <h3>
+                        Rp {{ number_format($totalRevenue,0,',','.') }}
+                    </h3>
+                </div>
+            </div>
         </div>
 
-        <div class="box">
-            <h3>Total Orders</h3>
-            <p>{{ $totalOrders }}</p>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6>Total Orders</h6>
+                    <h3>{{ $totalOrders }}</h3>
+                </div>
+            </div>
         </div>
 
-        <div class="box">
-            <h3>Average Order</h3>
-            <p>Rp {{ number_format($avgOrder, 0, ',', '.') }}</p>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6>Average Order</h6>
+                    <h3>
+                        Rp {{ number_format($avgOrder,0,',','.') }}
+                    </h3>
+                </div>
+            </div>
         </div>
+
     </div>
 
-    <!-- TABLE -->
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th class="right">Total</th>
-            </tr>
-        </thead>
+    {{-- TABEL --}}
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
 
-        <tbody>
-            @foreach($completedOrders as $order)
-            <tr>
-                <td>#{{ $order->id }}</td>
-                <td>{{ $order->name }}</td>
-                <td>{{ $order->created_at->format('d M Y') }}</td>
-                <td>{{ ucfirst($order->status) }}</td>
-                <td class="right">
-                    Rp {{ number_format($order->total_price, 0, ',', '.') }}
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+            <div class="table-responsive">
 
-    <!-- TOTAL -->
-    <div class="total-box">
-        TOTAL REVENUE: 
-        <span>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</span>
+                <table class="table table-hover">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Tanggal</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @forelse($orders as $order)
+
+                            <tr>
+
+                                <td>#{{ $order->id }}</td>
+
+                                <td>{{ $order->name }}</td>
+
+                                <td>
+                                    {{ $order->created_at->format('d M Y H:i') }}
+                                </td>
+
+                                <td>
+                                    {{ ucfirst($order->status) }}
+                                </td>
+
+                                <td>
+                                    Rp {{ number_format($order->total_price,0,',','.') }}
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    Tidak ada data
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
     </div>
 
 </div>
 
-</body>
-</html>
+@endsection

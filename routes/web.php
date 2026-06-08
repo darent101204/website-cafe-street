@@ -69,6 +69,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/reports/finance', [App\Http\Controllers\OrderController::class, 'financeReport'])
     ->name('admin.finance');
 
+    Route::get('/reports/financePDF', [App\Http\Controllers\OrderController::class, 'financePdf'])
+    ->name('admin.financePDF');
+
     // Kitchen Dashboard routes
     Route::get('/kitchen', [App\Http\Controllers\KitchenController::class, 'index'])->name('kitchen.index');
     Route::patch('/kitchen/{order}/status', [App\Http\Controllers\KitchenController::class, 'updateStatus'])->name('kitchen.status');

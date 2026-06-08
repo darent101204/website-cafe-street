@@ -8,11 +8,11 @@
     <div class="cs-auth-hero">
         <div class="cs-auth-hero-content">
             <div class="cs-auth-hero-logo">
-                <i class="fa fa-coffee"></i> Coffee Street
+                <i class="fa fa-coffee"></i> Plan B
             </div>
             <h1 class="cs-auth-hero-title">Start Your Journey!</h1>
             <p class="cs-auth-hero-text">
-                Join the Coffee Street club to get access to custom premium blends, rewards points, faster ordering, and exclusive seasonal member offers.
+                Join the Plan B club to get access to custom premium blends, rewards points, faster ordering, and exclusive seasonal member offers.
             </p>
         </div>
     </div>

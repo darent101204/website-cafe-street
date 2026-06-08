@@ -38,9 +38,9 @@
 
                 <!-- ── Logo ───────────────────────────────── -->
                 <a href="{{ route('home') }}" class="cs-nav__logo d-flex align-items-center text-decoration-none flex-shrink-0"
-                   aria-label="Coffee Street – Home">
-                    <img src="{{ asset('images/logo_coffe.svg') }}"
-                         alt="Coffee Street"
+                   aria-label="Plan B – Home">
+                    <img src="{{ asset('images/icon.png') }}"
+                         alt="Plan B"
                          class="cs-nav__logo-img"
                          style="height: 42px; width: auto;">
                 </a>
@@ -316,14 +316,14 @@
         <div class="container">
             <div class="d-flex flex-wrap justify-content-between align-items-center py-4 border-top">
                 <p class="col-md-4 mb-0 text-muted small">
-                    © {{ date('Y') }} Coffee Street · Made with
+                    © {{ date('Y') }} Plan B · Made with
                     <i class="fa fa-heart" style="color: var(--cs-orange);"></i>
                 </p>
 
                 <a href="{{ route('home') }}"
                    class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 text-decoration-none">
-                    <img src="{{ asset('images/logo_coffe.svg') }}"
-                         alt="Coffee Street"
+                    <img src="{{ asset('images/icon.png') }}"
+                         alt="Plan B"
                          style="max-height: 36px; width: auto;">
                 </a>
 

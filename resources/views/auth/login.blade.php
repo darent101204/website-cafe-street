@@ -8,7 +8,7 @@
     <div class="cs-auth-hero">
         <div class="cs-auth-hero-content">
             <div class="cs-auth-hero-logo">
-                <i class="fa fa-coffee"></i> Coffee Street
+                <i class="fa fa-coffee"></i> Plan B
             </div>
             <h1 class="cs-auth-hero-title">Welcome Back!</h1>
             <p class="cs-auth-hero-text">
@@ -21,7 +21,7 @@
     <div class="cs-auth-form-side">
         <div class="cs-auth-form-card">
             <h2 class="h3 fw-bold mb-1" style="color: var(--cs-brown);">Sign In</h2>
-            <p class="text-muted small mb-4">Access your Coffee Street account</p>
+            <p class="text-muted small mb-4">Access your Plan B account</p>
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
@@ -77,7 +77,7 @@
 
                 <!-- Register Link -->
                 <div class="text-center">
-                    <span class="text-muted small">New to Coffee Street?</span>
+                    <span class="text-muted small">New to Plan B?</span>
                     <a href="{{ route('register') }}" class="small text-decoration-none ms-1" style="color: var(--cs-orange); font-weight: 600;">
                         Create Account
                     </a>
